@@ -1,22 +1,26 @@
-# Doubao-Seed-Evolving 办公 Agent 实战报告：一个 Case、七个维度、十三项验收
+# Doubao-Seed-Evolving 办公 Agent 实测宣发报告
 
-**作者**：Zhiyao Zhang · 邮箱：zhang_zhiyao@outlook.com · 代码与数据：<https://github.com/zzybluebell/LLM-testing-seed-evolving/>
+*一个真实 Case · 七个维度 · 十三项自动验收 · 四模型同台对比*
 
-> **v0.3 · 2026-09-11 · 数字定稿（n=1，即每个模型 × 每种提示词各运行一次）**
->
-> **状态**：四个模型 × 两份提示词共 8 次运行全部结束并由脚本打分，所有【待填】已按第 9 节清单回填。"记录运行"是各单元格目录 `runs/<模型>/<提示词>/1/`；Evolving 两次和 DeepSeek / GLM 的详细版都存在更早的一次尝试（见 5.3），账本 `results/ledger.csv` 全部保留。
->
-> **写法**：遵守 `marketing/评测标准与对比写作规范.md`。只写脚本判定的结果；每个数字带模型、提示词版本、n、测试日期；对手的失分写原因；Evolving 的短板写在正文。打分规则在看到首批分数后改过一次（第 7 节），前后分数都公开。
+**作者**：Zhiyao Zhang  
+**邮箱**：zhang_zhiyao@outlook.com  
+**代码与数据**：<https://github.com/zzybluebell/LLM-testing-seed-evolving/>  
+**版本**：v0.4  
+**English edition**：[Here](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/Doubao-Seed-Evolving-Report-v0.4-EN.md)
+
+> **关于本报告**：四个模型 × 两份提示词共 8 次运行，每个组合各运行一次（n=1），全部由脚本打分，产物未经人工修改。每次运行的完整目录为 `runs/<模型>/<提示词>/1/`；Evolving 的两次运行与 DeepSeek / GLM 的详细版各有一次更早的尝试（见 5.3），所有尝试都记录在账本 [`results/ledger.csv`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/ledger.csv)。写作原则：只写脚本判定的结果；每个数字标注模型、提示词版本和测试日期；对手的失分写明原因；Evolving 的短板写在正文；打分规则在看到首批分数后调整过一次，调整前后的分数均在第 7 节公开。完整规范见 [`marketing/评测标准与对比写作规范.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md)。
 
 ---
 
 ## 0. 导读
 
-这份报告回答一个问题：让 Doubao-Seed-Evolving 以 Agent 方式独立完成一条"读财务数据 → 建带公式的 Excel 模型 → 画图 → 写投资人 PPT → 自检 → 指出旧材料里的错误"的办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
+这份报告回答一个问题：让 Doubao-Seed-Evolving 以 Agent 方式独立完成下面这条办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
+
+**读财务数据 → 建带公式的 Excel 模型 → 画图 → 写投资人 PPT → 自检 → 指出旧材料里的错误**
 
 七个维度：
 
-| # | 维度 | 测什么 |
+| 维度 | 名称 | 测什么 |
 |---|---|---|
 | D1 | 听懂人话 | 一句话模糊需求下交付了多少 |
 | D2 | 照 SOP 交付 | 七步详细规格下交付了多少 |
@@ -33,7 +37,7 @@
 
 ## 1. 核心结论
 
-给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（`evolving/vague/1`，2026-09-11），七步详细规格下通过 **13/13** 项（`evolving/detailed/1`，2026-09-11）。同一任务、同一 Agent 工具、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的 Ark（Volcengine Ark，火山引擎的大模型服务平台）端点不接受图片，靠 tesseract OCR 补救。
+给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1)，2026-09-11），七步详细规格下通过 **13/13** 项（[`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1)，2026-09-11）。同一任务、同一 Agent 工具、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的 Ark（Volcengine Ark，火山引擎的大模型服务平台）端点不接受图片，靠 tesseract OCR 补救。
 
 ---
 
@@ -50,22 +54,26 @@
 | **价格** | 输入 6 元 / 缓存命中 1.2 元 / 输出 30 元（每百万 tokens），按量付费；另有 Coding Plan / Agent Plan 订阅 | Ark "模型价格"页，2026-09-10 读取 |
 | **Anthropic 协议兼容** | `/api/compatible` 路由；接入只需 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_MODEL` 三个变量；1M 上下文需要 `[1m]` 后缀 | Ark 文档"接入 AI 工具 › Claude Code"，更新于 2026-08-26 |
 
-Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由前端脚本渲染，自动抓取无法获得 Evolving 的更新条目（`ASSUMPTIONS.md` 第 30 条）。本报告因此不引用该页内容；后续按周复测（Phase 6）时由人工读取并记入 `results/changelog.md`。
+Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由前端脚本渲染，自动抓取无法获得 Evolving 的更新条目（[`ASSUMPTIONS.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ASSUMPTIONS.md) 第 30 条）。本报告因此不引用该页内容；后续按周复测（Phase 6）时由人工读取并记入 `results/changelog.md`。
 
-### 2.2 协议层验证（2026-09-10）
+### 2.2 接入前的兼容性检查（2026-09-10）
 
-本次评测的全部模型均由同一个 Agent 工具驱动（Claude Code，一个命令行 Agent：负责将提示词提交给模型，代模型执行读文件、运行脚本、写文件等工具调用，并维护多轮对话状态；下文统称 harness）。此类基于 Anthropic 协议的工具在每一轮都会将上一轮的思考块原样回传给模型，因此模型能否在其中稳定工作，取决于一个硬性前提：按 Anthropic 规范返回带 `signature` 的思考块。我们使用 `scripts/probe_endpoints.py` 按 harness 的实际调用方式完成 5 项协议探测；表中"图片输入"一行来自正式运行中的观察（`VERIFY.md` 第 47 条）：
+正式测试前，先确认三个模型的 Ark 接口能否被同一个 Agent 工具正常驱动。本次所有模型都由同一个 Agent 工具驱动（Claude Code，一个命令行 Agent：把提示词交给模型，替模型执行读文件、运行脚本、写文件等操作，并维护多轮对话；下文统称 harness）。它按 Anthropic 接口规范工作，每一轮都会把模型上一轮的思考过程原样送回给模型；模型要在其中稳定工作，就必须按规范返回带签名（`signature`）的思考块，否则思考链在多轮工具调用中会断掉。
 
-| 探测项 | Evolving | DeepSeek-V4-Pro | GLM-5.2 |
-|---|---|---|---|
-| 基础对话 / 流式 / 工具调用（`tool_choice: any`） | ✅ / ✅ / ✅ | ✅ / ✅ / ✅ | ✅ / ✅ / ✅ |
-| 返回 thinking 块 | ✅ | ✅ | ✅ |
-| **thinking 块带 `signature`** | **✅ 三家唯一** | ❌ | ❌ |
-| 带签名思考链 + 工具结果回传后继续 | ✅ | ✅ | ✅ |
-| 用量字段（input / output / cache_read / cache_creation） | 全有 | 全有 | 全有 |
-| 图片输入（Agent 用 `Read` 工具读一张 PNG） | ✅ | ❌ 400 "Model do not support image input" | ❌ 同左 |
+我们用 [`scripts/probe_endpoints.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/probe_endpoints.py) 模拟 harness 的调用方式，对三个接口逐项检查；"图片输入"一项来自正式运行中的观察（[`VERIFY.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md) 第 47 条）：
 
-此外已验证：harness（2.1.231 版）在完全隔离的环境（`env -i` + 变量白名单 + 独立 `CLAUDE_CONFIG_DIR`）下以 `--effort high` 驱动三个模型均可端到端完成任务；Ark 在第二次请求即命中 13K tokens 缓存；Ark 不对缓存写入单独计费（`cache_creation_input_tokens` 恒为 0）。详见 `VERIFY.md` 第 1–13、45 条。
+| 检查项 | 检查什么 | Evolving | DeepSeek-V4-Pro | GLM-5.2 |
+|---|---|---|---|---|
+| 基础对话 / 流式输出 / 工具调用 | 能正常回话、边生成边输出、按要求调用工具 | ✅ / ✅ / ✅ | ✅ / ✅ / ✅ | ✅ / ✅ / ✅ |
+| 返回思考块 | 把推理过程作为 thinking 块返回 | ✅ | ✅ | ✅ |
+| **思考块带签名** | 思考块附带 `signature`，harness 才能在下一轮原样送回 | **✅ 三家唯一** | ❌ | ❌ |
+| 工具结果回传后继续 | 拿到工具执行结果后能接着推理 | ✅ | ✅ | ✅ |
+| 用量字段齐全 | 返回输入、输出、缓存命中的 token 数，成本才算得准 | 齐全 | 齐全 | 齐全 |
+| 图片输入 | Agent 用 `Read` 工具读一张 PNG 交给模型 | ✅ | ❌ 接口报 400 "Model do not support image input" | ❌ 同左 |
+
+结论：三个接口都能被 harness 驱动，差别在两项。只有 Evolving 返回带签名的思考块，它的思考链能在几十轮工具调用中完整往返；DeepSeek 与 GLM 的 Ark 接口不接受图片，看截图只能靠 OCR 补救（见 D4）。
+
+另外确认：harness（2.1.231 版）在完全隔离的环境里（`env -i` + 变量白名单 + 独立 `CLAUDE_CONFIG_DIR`）以 `--effort high` 驱动三个模型都能从头到尾完成任务；Ark 从第二次请求起即命中缓存（13K tokens）；Ark 不对缓存写入单独计费（`cache_creation_input_tokens` 恒为 0）。详见 [`VERIFY.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md) 第 1–13、45 条。
 
 ### 2.3 从产品主张到评测维度
 
@@ -90,7 +98,7 @@ Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由
 
 办公 Agent 真正的难点不是写一段文案，而是**跨工具、多步骤、有对错**的长链任务。我们选了投资人更新（Investor Update）这个典型场景，它同时覆盖数据处理、财务建模、可视化、文档生成、自检和多模态核对：
 
-- **输入**：`data/financials.xlsx`，36 个月 × 7 列，外加一句"期初 120 个活跃客户"，以及一张上季度董事会 PPT 第 7 页的截图。
+- **输入**：[`data/financials.xlsx`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/data/financials.xlsx)，36 个月 × 7 列，外加一句"期初 120 个活跃客户"，以及一张上季度董事会 PPT 第 7 页的截图。
 - **交付**：一份带活公式的 Excel 模型（CFO 能改假设）、两张图、一份 8–12 页的投资人 PPT，并指出截图里的错误。
 - **判分**：13 项机器验收，全部脚本判定，不做人工修饰，不改模型产物。
 
@@ -98,13 +106,13 @@ Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由
 
 | 文件 | 内容 | 埋的坑 |
 |---|---|---|
-| `data/financials.xlsx` | 单张 `raw` 表，36 行（2023-10 → 2026-09），列 `month, mrr, new_customers, churned_customers, cogs, sales_marketing_spend, headcount`。由 `scripts/gen_data.py` 用固定种子（42）生成，字节级可复现 | 活跃客户数**不在文件里**，模型必须从 120 逐月滚算 |
-| `data/last_board_deck_slide7.png` | 1600×900 的"Q2 Board Update — Unit Economics"幻灯片图，含 CAC / LTV / 回本月数 / ARPA 四个数 | CAC 故意写成真值的 1.35 倍（$1,583，真值 $1,172.91）；另外三个数与真值一致 |
-| `harness/CLAUDE.md` | 复制进每个运行目录：隔离目录、venv 里有 python-pptx / openpyxl / matplotlib / numpy-financial、交付物放 `./out/`、不要提问、做完再停 | — |
+| [`data/financials.xlsx`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/data/financials.xlsx) | 单张 `raw` 表，36 行（2023-10 → 2026-09），列 `month, mrr, new_customers, churned_customers, cogs, sales_marketing_spend, headcount`。由 [`scripts/gen_data.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/gen_data.py) 用固定种子（42）生成，字节级可复现 | 活跃客户数**不在文件里**，模型必须从 120 逐月滚算 |
+| [`data/last_board_deck_slide7.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/data/last_board_deck_slide7.png) | 1600×900 的"Q2 Board Update — Unit Economics"幻灯片图，含 CAC / LTV / 回本月数 / ARPA 四个数 | CAC 故意写成真值的 1.35 倍（$1,583，真值 $1,172.91）；另外三个数与真值一致 |
+| [`harness/CLAUDE.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/harness/CLAUDE.md) | 复制进每个运行目录：隔离目录、venv 里有 python-pptx / openpyxl / matplotlib / numpy-financial、交付物放 `./out/`、不要提问、做完再停 | — |
 
-五个输入文件（工作簿、截图、两份提示词、CLAUDE.md）的 SHA-256 记录在 `results/inputs.sha256`，Phase 6 复跑前用 `scripts/freeze_inputs.py --check` 断言未变。
+五个输入文件（工作簿、截图、两份提示词、CLAUDE.md）的 SHA-256 记录在 [`results/inputs.sha256`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/inputs.sha256)，Phase 6 复跑前用 `scripts/freeze_inputs.py --check` 断言未变。
 
-真值（`truth.json`，由 `scripts/truth.py` 按提示词里的定义算出）：
+真值（[`truth.json`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/truth.json)，由 [`scripts/truth.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/truth.py) 按提示词里的定义算出）：
 
 | 指标 | 真值 |
 |---|---|
@@ -125,7 +133,7 @@ Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由
 
 **为什么两份**：模糊版考"听懂人话"，即模型能不能从一句话推断出投资人和 CFO 各自需要什么；详细版考"照 SOP 交付"，即给了七步规格后能不能一步不落地做完并自检。两者得分之差，就是模型对指令质量的依赖度。
 
-**`prompts/vague.md`（一句话模糊版）**
+**[`prompts/vague.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/prompts/vague.md)（一句话模糊版）**
 
 ```
 Here is our last 36 months of financials (data/financials.xlsx). We started the period with 120 active customers. Put together an investor update deck with the numbers that matter, plus a supporting Excel model I can hand to our CFO. Also attached: data/last_board_deck_slide7.png, a screenshot of slide 7 from last quarter's board deck — if any number there conflicts with what you compute now, call it out. Save both files under ./out/.
@@ -133,7 +141,7 @@ Here is our last 36 months of financials (data/financials.xlsx). We started the 
 
 它故意不说页数、不说指标口径、不说要 DCF 或贷款表、不说文件名。模型要自己决定"the numbers that matter"是什么。
 
-**`prompts/detailed.md`（七步详细规格）**
+**[`prompts/detailed.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/prompts/detailed.md)（七步详细规格）**
 
 ```
 You are preparing an investor update for Bluebell SaaS Pte Ltd. Input: data/financials.xlsx, sheet "raw", 36 monthly rows with columns month, mrr, new_customers, churned_customers, cogs, sales_marketing_spend, headcount. We started the period with 120 active customers.
@@ -166,7 +174,7 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 
 ### 3.4 十三项验收：测什么、阈值、为什么
 
-由 `scripts/check.py` 对 `out/` 目录和 `truth.json` 打分；vague 可得满分 **9**，detailed 可得满分 **13**（c07–c10 只有详细版要求，模糊版没提 DCF 和贷款，任何模型都拿不到）。对比时写"7/9"而不是"7/13"。
+由 [`scripts/check.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/check.py) 对 `out/` 目录和 [`truth.json`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/truth.json) 打分；vague 可得满分 **9**，detailed 可得满分 **13**（c07–c10 只有详细版要求，模糊版没提 DCF 和贷款，任何模型都拿不到）。对比时写"7/9"而不是"7/13"。
 
 | 编号 | 检查 | 阈值 | 为什么测 | vague | detailed |
 |---|---|---|---|---|---|
@@ -184,11 +192,11 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 | c12 | 五个指标 PPT 与 Excel 一致 | 各 ≤ 1% | PPT 和模型必须同源，否则投资人一问就露馅 | ✅ | ✅ |
 | c13 | 指出旧截图的 CAC $1,583 有误 | 提到 1,583（±1%），或"board deck / slide 7 / last quarter"与"conflict / discrepan / differs / inconsisten / corrected"同现 | 多模态 + 判断力 + 敢指出错误；文本模型只能靠 OCR 过 | ✅ | ✅ |
 
-判分细节（为了可审计，全部写在 `ASSUMPTIONS.md` 第 18–19、25 条）：表名忽略大小写与空格/下划线；指标格取标签右侧（否则下方）第一个数值/公式格，NPV / IRR / PMT 也按公式文本找；公式占比排除标了 "assumption / input" 的输入块；NPV / IRR 没有 LibreOffice 时用 `formulas` 包求值（与 numpy-financial 一致到 1e-6）；c13 两个信号分别记录在 `check.json.stats`。
+判分细节（为了可审计，全部写在 [`ASSUMPTIONS.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ASSUMPTIONS.md) 第 18–19、25 条）：表名忽略大小写与空格/下划线；指标格取标签右侧（否则下方）第一个数值/公式格，NPV / IRR / PMT 也按公式文本找；公式占比排除标了 "assumption / input" 的输入块；NPV / IRR 没有 LibreOffice 时用 `formulas` 包求值（与 numpy-financial 一致到 1e-6）；c13 两个信号分别记录在 `check.json.stats`。
 
 ### 3.5 维度指标：从哪来、为什么看
 
-每次运行由 `scripts/run_one.py` 实时记录（`live.jsonl` 每轮一行），结束后 `parse_runs.py` 产出 `telemetry.json`，`cost.py` 产出 `cost.json`：
+每次运行由 [`scripts/run_one.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/run_one.py) 实时记录（`live.jsonl` 每轮一行），结束后 [`parse_runs.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/parse_runs.py) 产出 `telemetry.json`，[`cost.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/cost.py) 产出 `cost.json`：
 
 | 指标 | 字段 | 为什么看 |
 |---|---|---|
@@ -218,7 +226,7 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 - 同一个 harness（2.1.231 版），同一组 flags，`--effort high`，思考默认开启。
 - 每次运行独立目录、`env -i` 白名单环境、独立 `CLAUDE_CONFIG_DIR`，用户的全局设置、插件、MCP 都进不去；`ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL` 和 `CLAUDE_CODE_SUBAGENT_MODEL` 都指向被测模型，后台小任务也不会偷偷换模型；关闭非必要遥测。
 - 文本模型的图片问题按"环境限制"而非"模型不会"处理：DeepSeek / GLM 的 Ark 端点收到图片会 400，且图片留在会话里会让后续每个请求都失败（2026-09-10 观察到 4 次，每次 30–40 秒内死亡）。harness 为 `vision: false` 的模型装一个 `PreToolUse` hook，拦截对图片的 `Read` 并告诉模型"你不能看图，可以用 shell 里的 tesseract OCR"。提示词和 CLAUDE.md 对所有模型一字不改。
-- Opus 由用户手动跑，同版本 harness、同 effort，产出用同一个 `check.py` 打分；耗时和 tokens 取自交互模式 `/cost`。
+- Opus 由用户手动跑，同版本 harness、同 effort，产出用同一个 [`check.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/check.py) 打分；耗时和 tokens 取自交互模式 `/cost`。
 - n = 1（用户决定，2026-09-10）；无硬超时，只有 `--max-turns 60`（冒烟运行在 40 分钟被杀后决定）。
 - 不修改任何模型产物，不做人工加减分。
 
@@ -228,24 +236,24 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 claude -p "<prompt>" --output-format stream-json --verbose --include-partial-messages --max-turns 60 --dangerously-skip-permissions --effort high
 ```
 
-环境白名单 `HOME USER PATH` + `models.yaml` 的 `common_env` + 模型 env 块 + 独立 `CLAUDE_CONFIG_DIR`；venv（Python 3.13.7，python-pptx 1.0.2、openpyxl 3.1.5、matplotlib 3.11.1、numpy-financial 1.0.0）排在 PATH 最前；LibreOffice 未安装；tesseract 可用。完整版本锁定见 `VERSIONS.md`。
+环境白名单 `HOME USER PATH` + [`models.yaml`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/models.yaml) 的 `common_env` + 模型 env 块 + 独立 `CLAUDE_CONFIG_DIR`；venv（Python 3.13.7，python-pptx 1.0.2、openpyxl 3.1.5、matplotlib 3.11.1、numpy-financial 1.0.0）排在 PATH 最前；LibreOffice 未安装；tesseract 可用。完整版本锁定见 [`VERSIONS.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERSIONS.md)。
 
 ---
 
 ## 4. 七个维度的能力画像
 
-每条主张后面是证据来源；分数是 `check.py` 的判定，维度数字来自 `telemetry.json` / `cost.json`。全部 n=1。
+每条主张后面是证据来源；分数是 [`check.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/check.py) 的判定，维度数字来自 `telemetry.json` / `cost.json`。全部 n=1。
 
 ### D1 听懂人话：一句话也能交付
 
-- **主张**：只给一句话和一张表，Evolving 交付的 PPT + Excel 通过 9/9 项适用验收（`evolving/vague/1`，2026-09-11），四个模型里唯一满分。
+- **主张**：只给一句话和一张表，Evolving 交付的 PPT + Excel 通过 9/9 项适用验收（[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1)，2026-09-11），四个模型里唯一满分。
 - **证据**：9 页 PPT、5 张图、一张 5 行的 KPI 表（c02–c04）；PPT 上 CAC / LTV / 回本与真值误差 0 / 0 / 0.04%（c05）；Excel 五张表公式占比 **99.5%**（`Monthly_Model` 等，c11）；CAC、LTV、LTV/CAC、回本、ARPA 五个指标 PPT 与 Excel 全部对上（c12）；专门一页 `Slide 7 reconciliation` 写明冲突（c13）。
-- **对手同档的失分**：DeepSeek-V4-Pro 7/9（`deepseek/vague/1`：Excel 五张表 **0 个公式**，全部贴数字 → c11、c12）；GLM-5.2 7/9（`glm/vague/1`：PPT 没有任何表格形状 → c04；LTV 用了另一种流失口径偏 12% → c12）；Opus 5 8/9（`opus/vague/1`：PPT 写 LTV/CAC 6.9x，Excel 6.84 → c12）。
+- **对手同档的失分**：DeepSeek-V4-Pro 7/9（[`deepseek/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/deepseek/vague/1)：Excel 五张表 **0 个公式**，全部贴数字 → c11、c12）；GLM-5.2 7/9（[`glm/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/glm/vague/1)：PPT 没有任何表格形状 → c04；LTV 用了另一种流失口径偏 12% → c12）；Opus 5 8/9（[`opus/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/opus/vague/1)：PPT 写 LTV/CAC 6.9x，Excel 6.84 → c12）。
 - **要说清楚的**：这一分的差距来自打分规则的一次修订——Evolving 的模糊版工作簿没有叫 `unit_economics` 的表，第一版脚本把它的公式占比按空集算成 0，修订后按全部非输入表算（第 7 节）。修订对四个模型一视同仁，只改变了这一格的分数。
 
 ### D2 照 SOP 交付：给规格就到天花板
 
-- **主张**：七步规格下 Evolving 13/13（`evolving/detailed/1`，2026-09-11），与 Opus 5 持平；DeepSeek-V4-Pro、GLM-5.2 同样 13/13。
+- **主张**：七步规格下 Evolving 13/13（[`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1)，2026-09-11），与 Opus 5 持平；DeepSeek-V4-Pro、GLM-5.2 同样 13/13。
 - **证据**：11 页 PPT、3 张图、7 行单位经济表；`model.xlsx` 四张表公式占比 96.0%；九个指标误差全 0；附录一张对照表标出 CAC 冲突并给出更正值。
 - **写法**：详细规格下分数拉不开，区分点在 D4（Step 7 的视觉自检谁真做了）和第 6 节的过程质量。
 
@@ -297,8 +305,8 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 
 | 模型 | 提示词 | 验收 | 模型时间 | 轮数 / 工具调用 | 输出 tokens | 出字 tok/s | 缓存命中 | 峰值请求 | 成本 | 每通过一项 | c13 方式 | Step 7 自检 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Doubao-Seed-Evolving** | vague | **9/9** | 39 min（2,366 s） | 57 / 79 | 63.2K | 26.7 | 96.0% | 113K | ¥7.53 | ¥0.84 | 原生读图 | 未要求也做了：9 页缩略图逐页读回 |
-| **Doubao-Seed-Evolving** | detailed | **13/13** | 32 min（1,918 s） | 60 / 80 | 60.4K | 31.5 | 95.9% | 108K | ¥7.02 | ¥0.54 | 原生读图 | 自写渲染器，11 页逐页读回 |
+| **Doubao-Seed-Evolving** | **vague** | **9/9** | **39 min（2,366 s）** | **57 / 79** | **63.2K** | **26.7** | **96.0%** | **113K** | **¥7.53** | **¥0.84** | **原生读图** | **未要求也做了：9 页缩略图逐页读回** |
+| **Doubao-Seed-Evolving** | **detailed** | **13/13** | **32 min（1,918 s）** | **60 / 80** | **60.4K** | **31.5** | **95.9%** | **108K** | **¥7.02** | **¥0.54** | **原生读图** | **自写渲染器，11 页逐页读回** |
 | DeepSeek-V4-Pro | vague | 7/9 | 38 min（2,291 s） | 29 / 31 | 53.9K | 23.5 | 94.0% | 89K | ¥2.77 | ¥0.40 | OCR | — |
 | DeepSeek-V4-Pro | detailed | 13/13 | 16 min（954 s） | 50 / 66 | 75.7K | 79.3 | 96.7% | 116K | ¥4.09 | ¥0.31 | OCR | 未导出 |
 | GLM-5.2 | vague | 7/9 | 34 min（2,068 s） | 27 / 29 | 39.7K | 19.2 | 92.7% | 65K | ¥3.97 | ¥0.57 | OCR | — |
@@ -306,14 +314,14 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 | Claude Opus 5 | vague | 8/9 | 14 min（827 s；墙上 21.5 min） | 53 / 63 | 69.5K | 84.0 | 96.9% | 179K | $6.33 | $0.79 | 原生读图 | 9 页读回 |
 | Claude Opus 5 | detailed | 13/13 | 14 min（811 s；墙上 17.1 min） | 46 / 58 | 70.6K | 87.1 | 96.2% | 187K | $6.06 | $0.47 | 原生读图 | 11 页读回并修 6 处版式 |
 
-run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deepseek/detailed/1`、`glm/vague/1`、`glm/detailed/1`、`opus/vague/1`、`opus/detailed/1`（Opus 由用户在自己登录的 harness 里手动跑，会话记录经 `scripts/import_manual.py` 导入后与其他运行同一套解析与打分）。成本按各家牌价折算：Ark Evolving 6 / 1.2 / 30、DeepSeek 9 / 0.3 / 27、GLM 8 / 2 / 28 元每百万（输入 / 缓存命中 / 输出）；Opus $5 / $0.5 / $10（缓存写入）/ $25，与用户会话里 `/cost` 显示的 $6.43 / $6.18 相差 2% 以内，Max 订阅实际为包月。每通过一项按模糊版 9 项、详细版 13 项中的实际通过数计算。
+run_id：[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1)、[`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1)、[`deepseek/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/deepseek/vague/1)、[`deepseek/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/deepseek/detailed/1)、[`glm/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/glm/vague/1)、[`glm/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/glm/detailed/1)、[`opus/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/opus/vague/1)、[`opus/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/opus/detailed/1)。成本按各家牌价折算：Ark Evolving 6 / 1.2 / 30、DeepSeek 9 / 0.3 / 27、GLM 8 / 2 / 28 元每百万（输入 / 缓存命中 / 输出）；Opus $5 / $0.5 / $10（缓存写入）/ $25，与用户会话里 `/cost` 显示的 $6.43 / $6.18 相差 2% 以内，Max 订阅实际为包月。每通过一项按模糊版 9 项、详细版 13 项中的实际通过数计算。
 
 ### 5.2 逐项失分原因（脚本 notes 原文在各 run 的 `check.json`）
 
 | 运行 | 失分 | 原因 |
 |---|---|---|
-| Evolving vague | 无（c07–c10 为 vague 未要求项） | 9 页 5 图、5 行 KPI 表；Excel 公式占比 99.5%；五个指标 PPT↔Excel 全对上；第 8 页专门对账 |
-| Evolving detailed | 无 | 11 页 3 图、7 行表、公式占比 96.0%、九个指标误差 0；第 60 轮被上限截停，交付在第 43 轮完成 |
+| **Evolving vague** | **无（c07–c10 为 vague 未要求项）** | **9 页 5 图、5 行 KPI 表；Excel 公式占比 99.5%；五个指标 PPT↔Excel 全对上；第 8 页专门对账** |
+| **Evolving detailed** | **无** | **11 页 3 图、7 行表、公式占比 96.0%、九个指标误差 0；第 60 轮被上限截停，交付在第 43 轮完成** |
 | DeepSeek-V4-Pro vague | c11、c12（+ c07–c10 未要求） | Excel 五张表 **0 个公式**，全部贴数字；PPT 9 页 5 图、表格 5 行，全过；c13 靠 tesseract |
 | DeepSeek-V4-Pro detailed | 无 | 10 页 2 图、表格 7 行、公式占比 86.5%、误差 0；未导出幻灯片 |
 | GLM-5.2 vague | c04、c12（+ c07–c10 未要求） | PPT 9 页里**没有任何表格形状**；Excel 公式占比 100%，CAC / ARPA 精确，LTV 偏 12%、回本偏 1.2% → 只对上 4/5 |
@@ -325,52 +333,54 @@ run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deep
 
 | 尝试 | 结果 | 为什么不是记录运行 |
 |---|---|---|
-| `evolving/vague/1_failed_attempt1`（09-10 22:15 起） | 3 h 10 min、35 轮、¥4.92，被 Ark "System protection triggered by request burst" 拒绝而中止；对已写出的产出打分 7/13 | 基础设施错误，按规则重试一次 |
-| `evolving/detailed/1_failed_attempt1`（09-10 22:18 起） | 3 h 20 min、60 轮、¥7.64，**13/13**，视觉自检做了 | 当时的重试规则把"跑满 60 轮"误判为失败而重跑；两次都是 13/13，记录运行取 2 路并发下的第二次 |
+| **`evolving/vague/1_failed_attempt1`（09-10 22:15 起）** | **3 h 10 min、35 轮、¥4.92，被 Ark "System protection triggered by request burst" 拒绝而中止；对已写出的产出打分 7/13** | **基础设施错误，按规则重试一次** |
+| **`evolving/detailed/1_failed_attempt1`（09-10 22:18 起）** | **3 h 20 min、60 轮、¥7.64，13/13，视觉自检做了** | **当时的重试规则把"跑满 60 轮"误判为失败而重跑；两次都是 13/13，记录运行取 2 路并发下的第二次** |
 | DeepSeek / GLM detailed 首次（09-10 23:06 / 23:24 起） | 78 min、54 轮、¥5.07；66 min、57 轮、¥7.61（账本行） | 被一条带 `--force` 的矩阵命令覆盖后重跑；打分文件已丢失，重跑结果为记录运行 |
-| Evolving detailed 冒烟（09-10 20:20） | 40 分钟硬超时被杀于第 40 轮，12/13（c04：KPI 卡片不是表格） | 之后取消了硬超时 |
+| **Evolving detailed 冒烟（09-10 20:20）** | **40 分钟硬超时被杀于第 40 轮，12/13（c04：KPI 卡片不是表格）** | **之后取消了硬超时** |
 
-图（`scripts/report.py`）：`results/charts/lift.png`（模糊 vs 详细）、`results/charts/context_growth.png`（每轮请求 tokens，缓存部分浅色叠加）、`results/charts/time_split.png`（首字 / 模型 / 工具时间）。
+图（[`scripts/report.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/report.py)）：[`results/charts/lift.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/lift.png)（模糊 vs 详细）、[`results/charts/context_growth.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/context_growth.png)（每轮请求 tokens，缓存部分浅色叠加）、[`results/charts/time_split.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/time_split.png)（首字 / 模型 / 工具时间）。
 
 ---
 
 ## 6. Case 过程实录：Evolving 是怎么做的（记录运行，轮次可在 `session.jsonl` 回溯）
 
-这一节回答"它不只是拿了分，它是怎么干活的"。全部来自 `runs/evolving/*/1/session.jsonl` 的助手文本与工具调用。
+这一节回答"它不只是拿了分，它是怎么干活的"。全部来自 [`runs/evolving/*/1/session.jsonl`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving) 的助手文本与工具调用。
 
 ### 6.1 详细版（evolving/detailed/1，32 分钟，60 轮）
 
 1. **第 1–3 轮，先看再算**：列目录、读工作簿，然后直接 `Read` 截图，图片以原生图片块进入上下文。第 4 轮用 harness 的任务清单建了七步任务。
-2. **Step 1，算完就找冲突**（第 8–11 轮）：写 `compute.py`，输出后立刻说"LTV、回本、ARPA 与董事会页完全一致，但 CAC $1,583 是错的，更正值 $1,172.91，没有任何 12 个月窗口能得到 $1,583"。
-3. **Step 2，建模再独立重算**（第 12–17 轮）：`build_xlsx.py` 用 openpyxl 生成四张表；然后"模拟每条公式独立重算"，与 Python 结果比对后才标记完成。
+2. **Step 1，算完就找冲突**（第 8–11 轮）：写 [`compute.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/compute.py)，输出后立刻说"LTV、回本、ARPA 与董事会页完全一致，但 CAC $1,583 是错的，更正值 $1,172.91，没有任何 12 个月窗口能得到 $1,583"。
+3. **Step 2，建模再独立重算**（第 12–17 轮）：[`build_xlsx.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/build_xlsx.py) 用 openpyxl 生成四张表；然后"模拟每条公式独立重算"，与 Python 结果比对后才标记完成。
 4. **Step 3，图先过配色再画**（第 18–26 轮）：加载 dataviz 技能、校验配色，画完读回两张图，发现 MRR 起点标签与 x 轴刻度相撞，改完再读一次确认。
-5. **Step 4–5，写完 PPT 自己验 50 项**（第 30–43 轮）：`build_pptx.py` 生成 11 页；`verify.py` 重新打开 PPT 和 Excel 逐项核对，**50/50 通过**，写入 `verification_checklist.txt`；顺手发现图片框拉伸了长宽比，改掉。
+5. **Step 4–5，写完 PPT 自己验 50 项**（第 30–43 轮）：[`build_pptx.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/build_pptx.py) 生成 11 页；[`verify.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/verify.py) 重新打开 PPT 和 Excel 逐项核对，**50/50 通过**，写入 [`verification_checklist.txt`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/verification_checklist.txt)；顺手发现图片框拉伸了长宽比，改掉。
 6. **Step 6**：附录对照表——CAC $1,583.00 vs $1,172.91 标 CONFLICT，其余三项 Match。
-7. **Step 7，没有 LibreOffice 就自己写渲染器**（第 44–52 轮）：确认 soffice 不存在后写 `render_slides.py`（python-pptx + Pillow，带越界检查），导出 11 张 PNG **逐张读回**：第 2 页 KPI 卡片标签与数值相撞、第 6 页标题溢出标题栏、第 10 页附录行距累计重叠、第 3/5 页要点框太紧、毛利图刻度拥挤。
-8. **第 53–60 轮修版式，被上限截停**：连续 7 次 `Edit` 修 `build_pptx.py`，第 60 轮还在 `grep` 检查改动，轮数用完。**改动没有重新导出**，交付物是第 43 轮的版本（打分 13/13）。全程没有向用户提问。
+7. **Step 7，没有 LibreOffice 就自己写渲染器**（第 44–52 轮）：确认 soffice 不存在后写 [`render_slides.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/render_slides.py)（python-pptx + Pillow，带越界检查），导出 11 张 PNG **逐张读回**：第 2 页 KPI 卡片标签与数值相撞、第 6 页标题溢出标题栏、第 10 页附录行距累计重叠、第 3/5 页要点框太紧、毛利图刻度拥挤。
+8. **第 53–60 轮修版式，被上限截停**：连续 7 次 `Edit` 修 [`build_pptx.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/detailed/1/work/out/build/build_pptx.py)，第 60 轮还在 `grep` 检查改动，轮数用完。**改动没有重新导出**，交付物是第 43 轮的版本（打分 13/13）。全程没有向用户提问。
 
 ### 6.2 模糊版（evolving/vague/1，39 分钟，57 轮）
 
 1. **第 2 轮读图，第 6 轮起疑**：直接看截图后说"ARPA $236.27 精确等于 2026 年 9 月，而不是二季度末；按毛增客户算 CAC 约 $1.16k，$1.58k 只在 2025 年中作为净增口径出现"。第 6–7 轮穷举分母和时间窗，第 8 轮结论"对账无懈可击：截图的 ARPA、LTV、回本都在 2026-09 这一刀上重现（回本正好 6.44），$1,583 只能作为净增口径 CAC 重现"。
 2. **自己决定"重要的数字"**（第 8–23 轮）：加载 dataviz 技能校验配色，画了 5 张图（MRR、单位经济、增长、客户、效率），读回后发现 x 轴标签被切成 "202 23"、CAC 标注压线、效率图刻度太密，分两轮改完再读。
-3. **Excel 用活公式并独立求值**（第 25–31 轮）：`build_model.py` 生成五张表（Raw_Data、Monthly_Model、KPI_Summary、Slide7_Reconciliation、Notes）；没有 LibreOffice 就用 Python `formulas` 引擎把每条公式算一遍，"26 项公式检查全过，交叉核对 $1,578.59 净增 CAC 与 $1,173.81 隐含 CAC 都对上"。打分时公式占比 99.5%。
+3. **Excel 用活公式并独立求值**（第 25–31 轮）：[`build_model.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/vague/1/work/work_charts/build_model.py) 生成五张表（Raw_Data、Monthly_Model、KPI_Summary、Slide7_Reconciliation、Notes）；没有 LibreOffice 就用 Python `formulas` 引擎把每条公式算一遍，"26 项公式检查全过，交叉核对 $1,578.59 净增 CAC 与 $1,173.81 隐含 CAC 都对上"。打分时公式占比 99.5%。
 4. **PPT 9 页，第 8 页专门对账**（第 32–34 轮）：截图四个数与"同口径重算的 Q2 末值"和"今天的值"并排。
 5. **Step 7 没要求也做了，先试 GUI 再退回**（第 35–46 轮）：发现本机有 PowerPoint，用 AppleScript 让它导出 PDF，被 macOS 自动化权限挡住；换 Keynote 同样被挡；改用 Quick Look 缩略图，发现只渲染第一页，就把每一页拆成单页文件逐个缩略。
 6. **逐页读回抓出自己的算术错误**（第 47–52 轮）：读回 9 页后说"第 5 页客户图标题写 +531，757 − 120 应是 **637**"，另有第 9 页一个过期数字和一个悬空星号；改完重新导出两页读回确认。
 7. **第 53–56 轮收尾**：把图移进 `out/assets/`，删掉 PowerPoint 留下的锁文件，做工作簿预览，57 轮自行结束（`subtype success`）。
 
-两点提醒：模糊版交付物用的是自己起的文件名（`Bluebell_Investor_Update_Q3_2026.pptx`、`Bluebell_Investor_Model.xlsx`），`check.py` 兜底取 `out/` 下的 pptx / xlsx，打分不受影响，下游自动化要注意；第 5 步的 GUI 尝试说明 harness 隔离的是环境变量与配置，不是桌面。
+两点提醒：模糊版交付物用的是自己起的文件名（[`Bluebell_Investor_Update_Q3_2026.pptx`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/vague/1/work/out/Bluebell_Investor_Update_Q3_2026.pptx)、[`Bluebell_Investor_Model.xlsx`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/runs/evolving/vague/1/work/out/Bluebell_Investor_Model.xlsx)），[`check.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/check.py) 兜底取 `out/` 下的 pptx / xlsx，打分不受影响，下游自动化要注意；第 5 步的 GUI 尝试说明 harness 隔离的是环境变量与配置，不是桌面。
 
 ---
 
-## 7. 如实写出的边界
+## 7. 评测局限与短板
+
+本节列出三类内容：本次评测本身的局限（哪些比较不公平、哪些没测、中途改过什么）、Evolving 已经暴露的短板，以及后续需要改进的地方。读第 5 节的数字时请一并参考。
 
 - harness 是 Anthropic 自家的工具，Opus 5 天然占优，它是天花板参照，不是公平对手；Opus 由用户手动跑，其余在 `env -i` 隔离环境里由脚本跑。
 - DeepSeek-V4-Pro 的缓存命中价是 Evolving 的四分之一（0.3 vs 1.2 元），长任务 93–97% 的 tokens 是缓存命中，成本对比要看总账而非单价；GLM-5.2 的缓存价（2.0 元）反而更高。
 - DeepSeek / GLM "看不了图"是 Ark 端点限制，不是模型不会看图；写成"端点不接受图片输入，需 OCR 补救"。
 - Evolving 慢：详细版 32 分钟，是 DeepSeek / GLM 的两倍；单轮等首字最长四分钟；4 路并发时首轮尝试跑了 3 小时以上。这是深度思考的代价，写在正文。
-- **打分规则改过一次**：看到首批分数后给 `check.py` 加了两条兜底——文件名不按 `model.xlsx` / `investor_update.pptx` 时取 `out/` 下的 xlsx / pptx；工作簿没有 `unit_economics` / `dcf` / `loan` 表时在全部非输入表里找指标、算公式占比。前者影响所有模糊版运行的可打分性，后者只把 Evolving 模糊版从 7 提到 9，其余不变（`VERIFY.md` 第 66 条）。
-- **当晚的操作失误**（`VERIFY.md` 第 56 条）：误删过一次跑到一半的 GLM 运行；一条 `--force` 矩阵命令覆盖了 DeepSeek / GLM 已完成的详细版结果并重跑；重试规则把"跑满 60 轮"当失败，把 Evolving 两次都重跑了一遍。记录运行取重跑结果，所有尝试都在账本里。
+- **打分规则改过一次**：看到首批分数后给 [`check.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/check.py) 加了两条兜底——文件名不按 `model.xlsx` / `investor_update.pptx` 时取 `out/` 下的 xlsx / pptx；工作簿没有 `unit_economics` / `dcf` / `loan` 表时在全部非输入表里找指标、算公式占比。前者影响所有模糊版运行的可打分性，后者只把 Evolving 模糊版从 7 提到 9，其余不变（[`VERIFY.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md) 第 66 条）。
+- **当晚的操作失误**（[`VERIFY.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md) 第 56 条）：误删过一次跑到一半的 GLM 运行；一条 `--force` 矩阵命令覆盖了 DeepSeek / GLM 已完成的详细版结果并重跑；重试规则把"跑满 60 轮"当失败，把 Evolving 两次都重跑了一遍。记录运行取重跑结果，所有尝试都在账本里。
 - 目前所有数据 n=1，没有中位数和方差；写"稳定"之前至少要 n=3。
 - 无硬超时是 2026-09-10 的决定，耗时对比是"自然完成时间"；Evolving 详细版两次都在第 60 轮被上限截停（交付早已完成）。
 - 第三个国产对手原计划 Kimi K3，中转渠道无可用通道，改为 GLM-5.2；`evolving_pinned`（Seed-2.1-pro 对照）本轮没跑，官方"比 2.1-pro 更省 token"无法验证。
@@ -411,17 +421,16 @@ cd ~/Desktop/Work/LLM-testing
 
 ---
 
-## 9. 回填记录
+## 9. 未来展望
 
-第 1 节、第 4 节 D1–D7 与速度、第 5 节 5.1–5.3、第 6 节、第 7 节已按 v0.2 的回填清单用记录运行的最终数字改写（E-1 至 E-13 全部关闭）。数据来源：`results/results.csv`（`scripts/report.py` 生成）、各 run 目录的 `check.json` / `telemetry.json` / `cost.json`、`results/ledger.csv`；英文版六段报告见 `results/REPORT.md`。
+本报告目前只有一个办公 Agent 的 Case。评测骨架（端点配置、harness 驱动、遥测抽取、脚本判定、报告生成）与具体任务无关，后续计划在不改动骨架的前提下补充编码类 Case，初步设想四个任务族（编号沿用 [`TASK.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/TASK.md) 对本案例的命名 Case C，后续编码任务族依次编为 D、E、F、G）：
 
-复核命令：
+- **D 缺陷修复**：给 issue 和仓库，隐藏测试判定（SWE-bench 口径）
+- **E 规格实现**：给规格从零写服务或 CLI，契约测试判定
+- **F 重构与迁移**：大改动后原测试全绿且行为等价
+- **G 分析流水线工程化**：把本案例的"读数 → 计算 → 出图"固化为可复跑、带测试的代码
 
-```bash
-cd ~/Desktop/Work/LLM-testing
-.venv/bin/python scripts/show_run.py            # 8 次记录运行 + 更早尝试的一行速览
-.venv/bin/python scripts/report.py              # 重新生成 results.csv / summary.md / charts
-```
+每个 Case 仍沿用双提示词、全脚本判定、真值隔离和现有七个维度。里程碑按 G → D → E / F 的顺序推进，最后把全部任务族纳入周度复跑，绘制按任务族的演化曲线。任务族定义、判定方法、污染控制与里程碑见 [ROADMAP.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ROADMAP.md)。
 
 ---
 
@@ -431,4 +440,4 @@ cd ~/Desktop/Work/LLM-testing
 - 知乎：《Doubao-Seed-Evolving 升级：1M 上下文来了！》（zhuanlan.zhihu.com/p/2060789063779620845）；《实测豆包 Seed Evolving：1M 上下文 + 长程稳定，国产模型能扛真活了》（zhuanlan.zhihu.com/p/2064770421728268641，搜狐同文 sohu.com/a/1054997740_115856）
 - AITNT / 腾讯新闻 2026-07-17：《告别版本号！豆包首款无限进步模型：Seed-Evolving 实测》（aitntnews.com/newDetail.html?newId=27330）
 - Ark "模型价格"页（2026-09-10 读取）；Ark 文档"接入 AI 工具 › Claude Code"（更新于 2026-08-26）
-- 本仓库：`TASK.md`（基准定义）、`VERIFY.md`（探测与运行记录）、`ASSUMPTIONS.md`（判分与环境假设）、`VERSIONS.md`（版本锁定）、`results/opus-summary.md`（Opus 手动运行记录）、`marketing/评测标准与对比写作规范.md`
+- 本仓库：[`TASK.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/TASK.md)（基准定义）、[`VERIFY.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md)（探测与运行记录）、[`ASSUMPTIONS.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ASSUMPTIONS.md)（判分与环境假设）、[`VERSIONS.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERSIONS.md)（版本锁定）、[`results/opus-summary.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/opus-summary.md)（Opus 手动运行记录）、[`marketing/评测标准与对比写作规范.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md)

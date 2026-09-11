@@ -24,7 +24,7 @@ Doubao-Seed-Evolving、DeepSeek、GLM 与 Claude Opus，两份提示词（`vague
   原始对话日志 `session.jsonl`（每个 10–30 MB）一并入库；失败的重试目录和 Claude Code 本地状态不入库，见 `.gitignore`。
   日志中的本机路径已统一替换为 `/home/user`
 - `tests/` 回放用的假 `claude` 夹具与参考运行
-- `marketing/` 评测写作规范与宣发报告（v0.3 定稿）
+- `marketing/` 评测写作规范与宣发报告（v0.4，中英双语）
 
 ## 快速开始
 

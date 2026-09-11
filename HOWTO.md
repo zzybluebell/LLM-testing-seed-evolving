@@ -152,7 +152,7 @@ open manual_runs/evolving/vague/1/work/out/investor_update.pptx manual_runs/evol
 | Phase 1 | 数据 + 截图、真值、提示词、harness、全部脚本 | 完成（2026-09-10） |
 | Phase 2 | 冒烟：evolving × detailed 一次；解析、打分、核对遥测；然后停 | 等你说"开始" |
 | Phase 3 | 全矩阵 3 模型 × 2 提示词 × 1 次 + Opus 手动 2 次 = 8 次 | 完成（2026-09-11） |
-| Phase 4 | `results/REPORT.md`（英文六段）+ `marketing/…v0.3.md`（数字定稿） | 完成（2026-09-11） |
+| Phase 4 | `results/REPORT.md`（英文六段）+ `marketing/…v0.4.md`（中英双语） | 完成（2026-09-11） |
 | Phase 6 | 每周一 `scripts/weekly.py --week N`：核对输入未变、抓 Ark 更新日志、只跑 evolving 详细版 3 次、画演化曲线 | 之后 |
 
 ## 4. 费用预估
