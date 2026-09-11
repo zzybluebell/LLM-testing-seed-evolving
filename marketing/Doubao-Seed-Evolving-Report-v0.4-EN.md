@@ -2,7 +2,7 @@
 
 *One real case · seven dimensions · thirteen automated checks · four models side by side*
 
-**Author**: Zhiyao Zhang  
+**Author**: [Zhiyao Zhang](https://www.linkedin.com/in/zhang-zhiyao-bluebell/)  
 **Email**: zhang_zhiyao@outlook.com  
 **Code & data**: <https://github.com/zzybluebell/LLM-testing-seed-evolving/>  
 **Version**: v0.4 (English edition)

@@ -2,7 +2,7 @@
 
 *一个真实 Case · 七个维度 · 十三项自动验收 · 四模型同台对比*
 
-**作者**：Zhiyao Zhang  
+**作者**：[Zhiyao Zhang](https://www.linkedin.com/in/zhang-zhiyao-bluebell/)  
 **邮箱**：zhang_zhiyao@outlook.com  
 **代码与数据**：<https://github.com/zzybluebell/LLM-testing-seed-evolving/>  
 **版本**：v0.4  
