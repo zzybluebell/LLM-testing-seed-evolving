@@ -23,7 +23,7 @@
 
 ## 0. Overview
 
-This report answers one question: when Doubao-Seed-Evolving is asked to complete the office workflow below on its own, as an agent, how well does it do, and where does it stand next to DeepSeek-V4-Pro, GLM-5.2 and Claude Opus 5?
+When Doubao-Seed-Evolving is asked to complete the office workflow below on its own, as an agent, how well does it do, and where does it stand next to DeepSeek-V4-Pro, GLM-5.2 and Claude Opus 5?
 
 **Read the financials → build a formula-driven Excel model → draw the charts → write the investor deck → self-check → flag the error in last quarter's material**
 
@@ -40,13 +40,44 @@ Seven dimensions:
 | D7 | Protocol compatibility, zero migration | Signed thinking blocks round-trip, three-line setup, fixed model ID |
 | — | Speed (a weakness) | Output tokens per second, per-turn wait |
 
-**Summary**: under the detailed spec all four models score 13/13; under the one-line brief Evolving scores 9/9, DeepSeek-V4-Pro 7/9, GLM-5.2 7/9 and Claude Opus 5 8/9. Among the three domestic models, only Evolving **reads images natively** and **round-trips signed thinking blocks**; the price is that it is the slowest, with a cost in GLM's range and above DeepSeek's.
+**Summary**: under the detailed spec all four models score 13/13; under the vague brief Evolving scores 9/9, DeepSeek-V4-Pro 7/9, GLM-5.2 7/9 and Claude Opus 5 8/9. Among the three domestic models, only Evolving **reads images natively** and **round-trips signed thinking blocks**; the price is that it is the slowest, with a cost in GLM's range and above DeepSeek's.
 
 ---
 
 ## 1. Key findings
 
-Give Doubao-Seed-Evolving a 36-month financial spreadsheet and one sentence, and it completes the whole office workflow on its own: computing the metrics, building a formula-driven Excel model, drawing the charts, writing the investor deck, checking itself, and flagging the error in an old screenshot. It passes **9/9** applicable checks under the vague prompt ([`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1), 2026-09-11) and **13/13** under the seven-step spec ([`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1), 2026-09-11). Same task, same agent tool, same night: DeepSeek-V4-Pro 7/9 and 13/13, GLM-5.2 7/9 and 13/13, Claude Opus 5 8/9 and 13/13 (n=1, 2026-09-10 / 11). All four models flagged the wrong CAC of $1,583 in the screenshot, but only Evolving and Opus did so by looking at the image; the Ark (Volcengine Ark, Volcengine's model service platform) endpoints of DeepSeek and GLM do not accept images, and both fell back to tesseract OCR.
+**Summary**: On the same harness and the same frozen inputs, Doubao-Seed-Evolving took a 36-month financial spreadsheet and a one-line vague brief and completed the full investor-update workflow end to end: modelling, charting, deck production, self-review and correction of the prior material. It scored 9/9 on the vague brief and 13/13 on the detailed spec, level with Claude Opus 5; among the three domestic models it is the only one with a perfect score, the only one with native vision, and the only one whose reasoning chain round-trips intact.
+
+| Model | Vague brief (out of 9) | Seven-step spec (out of 13) | How the screenshot error was caught | Visual self-check |
+|---|---|---|---|---|
+| **Doubao-Seed-Evolving** | **9/9** | **13/13** | **Native vision** | **Done in both runs** |
+| DeepSeek-V4-Pro | 7/9 | 13/13 | OCR fallback | Not exported |
+| GLM-5.2 | 7/9 | 13/13 | OCR fallback | Exported, could not view |
+| Claude Opus 5 (ceiling reference) | 8/9 | 13/13 | Native vision | Done in both runs |
+
+Same task, same harness, same night, n=1, 2026-09-10 / 11; run IDs and the reason behind every lost check are in section 5. The points below are grouped as delivery, unique capabilities, process quality, and cost with the weakness.
+
+### 1.1 Delivery: perfect score, level with the ceiling
+
+- **The only perfect score on the vague brief.** 9/9 applicable checks under the vague prompt ([`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1), 2026-09-11). Where the others lost points: DeepSeek-V4-Pro 7/9, zero formulas across five Excel sheets; GLM-5.2 7/9, no table in the deck and an LTV definition 12% off; Opus 5 8/9, LTV/CAC on the slide did not match the workbook.
+- **Given a spec, it reaches the ceiling.** 13/13 under the seven-step spec ([`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1), 2026-09-11), level with Opus 5; DeepSeek and GLM also 13/13.
+- **Every number right, and the workbook is live.** All nine financial metrics (CAC, LTV, LTV/CAC, payback, ARPA, NPV, IRR, monthly payment, total interest) match ground truth with zero error; formula share 99.5% (vague) / 96.0% (detailed), not pasted values.
+
+### 1.2 Capabilities unique among the three domestic models
+
+- **Native vision.** The wrong CAC of $1,583 in the screenshot was seen, not OCR'd: both runs read the image directly in turns 2–3, with 20 / 15 image reads over the whole run. The Ark endpoints of DeepSeek and GLM reject images (HTTP 400); both had to fall back to tesseract OCR.
+- **Full reasoning round-trip, zero-degradation integration.** All 46 / 45 thinking blocks across the two runs carried signatures (`thinking_signature_seen True`), so the harness needed no workaround; all four DeepSeek and GLM runs were False. Integration is three environment variables, and the model ID stays fixed at `doubao-seed-evolving`.
+- **The visual self-check actually happened.** Under the vague prompt it read back all 9 slide thumbnails without being asked; under the detailed spec it wrote its own renderer and read back all 11 slides before fixing them. Of the domestic competitors, one never exported and the other exported but could not view the result.
+
+### 1.3 Process quality: more than finishing the task
+
+- **Depth of correction.** Rather than just flagging $1,583 as wrong, it enumerated denominators and time windows, showed the figure can only be reproduced as a net-adds CAC from mid-2025, and reconciled three columns side by side on the slide; DeepSeek and GLM wrote only that no standard definition reproduces it.
+- **Stays on a long task without asking back.** Both runs: `babysit 0`, no context compaction, no timeout. The detailed run was stopped by the 60-turn cap, but the deliverables were written by turn 43 and had passed its own 50-item checklist; the remaining 17 turns went to page-by-page review and layout fixes.
+
+### 1.4 Cost and the weakness
+
+- **About one sixth of Opus at list price.** ¥7.53 / ¥7.02 per run (vague / detailed) against roughly ¥45 / ¥43 for Opus 5 at list price; ¥0.84 / ¥0.54 per passed check. In GLM's range and above DeepSeek, so "cheapest" does not hold.
+- **The weakness is speed.** 26.7 / 31.5 output tok/s, 32 minutes for the detailed run against 13.5–17 minutes for the others; under concurrency a single turn can wait several minutes. Suited to long tasks run in the background, not to interactive use at the screen.
 
 ---
 

@@ -14,7 +14,7 @@
 
 ## 0. 导读
 
-这份报告回答一个问题：让 Doubao-Seed-Evolving 以 Agent 方式独立完成下面这条办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
+让 Doubao-Seed-Evolving 以 Agent 方式独立完成下面这条办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
 
 **读财务数据 → 建带公式的 Excel 模型 → 画图 → 写投资人 PPT → 自检 → 指出旧材料里的错误**
 
@@ -31,13 +31,44 @@
 | D7 | 协议兼容与零迁移 | 思考链签名往返、三行接入、固定 ID |
 | — | 速度（短板） | 出字速度、单轮等待 |
 
-**总结**：详细规格下四个模型都是 13/13；一句话需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving **原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
+**总结**：详细规格下四个模型都是 13/13；模糊需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving **原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
 
 ---
 
 ## 1. 核心结论
 
-给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1)，2026-09-11），七步详细规格下通过 **13/13** 项（[`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1)，2026-09-11）。同一任务、同一 Agent 工具、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的 Ark（Volcengine Ark，火山引擎的大模型服务平台）端点不接受图片，靠 tesseract OCR 补救。
+**总结**：在同一 harness、同一冻结输入的条件下，Doubao-Seed-Evolving 仅凭一份 36 个月的财务表和一句模糊需求，端到端完成了"建模、制图、成稿、自检、纠错"的完整投资人更新工作流：模糊需求 9/9、详细规格 13/13，与 Claude Opus 5 持平；在三家国产模型中，它是唯一取得满分、唯一原生读图、唯一思考链完整往返的一家。
+
+| 模型 | 模糊需求（满分 9） | 七步规格（满分 13） | 截图纠错方式 | 视觉自检 |
+|---|---|---|---|---|
+| **Doubao-Seed-Evolving** | **9/9** | **13/13** | **原生读图** | **两次都做** |
+| DeepSeek-V4-Pro | 7/9 | 13/13 | OCR 补救 | 未导出 |
+| GLM-5.2 | 7/9 | 13/13 | OCR 补救 | 导出后无法看回 |
+| Claude Opus 5（参照） | 8/9 | 13/13 | 原生读图 | 两次都做 |
+
+同一任务、同一 harness、同一晚，n=1，2026-09-10 / 11；run_id 与逐项失分原因见第 5 节。下面按"交付效果、独有能力、过程质量、成本与短板"四组展开。
+
+### 1.1 交付效果：满分，且与天花板持平
+
+- **模糊需求下唯一满分。** 模糊提示词下通过 9/9 项适用验收（[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/vague/1)，2026-09-11）。对手同档失分：DeepSeek-V4-Pro 7/9，Excel 五张表 0 个公式；GLM-5.2 7/9，PPT 没有表格、LTV 口径偏 12%；Opus 5 8/9，PPT 与 Excel 的 LTV/CAC 不一致。
+- **完整Prompts结果满分。** 七步详细规格下 13/13（[`evolving/detailed/1`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/runs/evolving/detailed/1)，2026-09-11），与 Opus 5 持平，DeepSeek、GLM 同为 13/13。
+- **数字全对，Excel 是活的。** 九个财务指标（CAC、LTV、LTV/CAC、回本、ARPA、NPV、IRR、月供、总利息）与真值误差全部为 0；工作簿公式占比 99.5%（模糊版）/ 96.0%（详细版），不是贴数字。
+
+### 1.2 三家国产模型里独有的能力
+
+- **原生读图。** 截图里 CAC $1,583 的错误是"看"出来的：两次运行都在第 2–3 轮直接读入截图，全程读图 20 次 / 15 次。DeepSeek 与 GLM 的 Ark 端点不接受图片（HTTP 400），只能靠 tesseract OCR 补救。
+- **思考链完整往返，接入零降级。** 两次运行 46 / 45 个思考块全部带签名（`thinking_signature_seen True`），harness 不需要任何降级处理；DeepSeek、GLM 四次运行全为 False。接入只需三个环境变量，模型 ID 固定为 `doubao-seed-evolving`。
+- **视觉自检真的做了。** 模糊版没要求也把 9 页幻灯片缩略图逐页读回；详细版自写渲染器，11 页逐页读回再改。国产对手一家没有导出，一家导出了但看不回去。
+
+### 1.3 过程质量：不只是把题做完
+
+- **纠错有深度。** 对旧截图的 $1,583 不只写"有误"，而是穷举分母和时间窗，反推出它只能作为 2025 年中的净增口径 CAC 重现，并在 PPT 上并排三列对账；DeepSeek 与 GLM 只写"任何标准口径都重现不了"。
+- **长任务不回头问。** 两次运行 `babysit 0`、无上下文压缩、无超时。详细版在第 60 轮被上限截停，但交付文件在第 43 轮已写完并通过自己的 50 项核对，后 17 轮全部花在逐页自检和修版式上。
+
+### 1.4 成本与短板
+
+- **成本是 Opus 牌价的约六分之一。** 每次运行 ¥7.53 / ¥7.02（模糊 / 详细），Opus 5 按牌价折算约 ¥45 / ¥43；每通过一项验收 ¥0.84 / ¥0.54。与 GLM 同档，高于 DeepSeek，"最省钱"不成立。
+- **短板是速度。** 出字 26.7 / 31.5 tok/s，详细版整轮 32 分钟，对手 13.5–17 分钟；并发时单轮等待可达数分钟。适合放在后台跑的长任务，不适合等在屏幕前的交互场景。
 
 ---
 
