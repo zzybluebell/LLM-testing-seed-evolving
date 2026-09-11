@@ -1,0 +1,19 @@
+# secrets / local env
+.env
+.venv/
+.claude/
+
+# python
+__pycache__/
+*.pyc
+.DS_Store
+
+# run artifacts: keep check.json / telemetry.json / cost.json / meta.json / work/out,
+# drop raw transcripts (tens of MB each), Claude Code state, and failed attempts
+runs/**/session.jsonl
+runs/**/live.jsonl
+runs/**/claude_config/
+runs/**/*_failed_attempt*/
+runs/**/stderr.log
+runs/live.jsonl
+runs/matrix.json

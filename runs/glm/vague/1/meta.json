@@ -1,0 +1,61 @@
+{
+  "run_id": "glm/vague/1",
+  "week": "",
+  "model": "glm",
+  "label": "GLM-5.2 (Ark)",
+  "prompt": "vague",
+  "n": 1,
+  "start": 1789051773.053765,
+  "end": 1789053852.576921,
+  "start_iso": "2026-09-10T22:49:33",
+  "end_iso": "2026-09-10T23:24:12",
+  "wall_s": 2079.5,
+  "exit_code": 0,
+  "timed_out": false,
+  "claude_version": "2.1.231 (Claude Code)",
+  "effort": "high",
+  "command": [
+    "claude",
+    "-p",
+    "<vague.md, 439 chars>",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--include-partial-messages",
+    "--max-turns",
+    "60",
+    "--dangerously-skip-permissions",
+    "--effort",
+    "high"
+  ],
+  "env": {
+    "HOME": "/Users/zzy",
+    "USER": "zzy",
+    "PATH": "/Users/zzy/Desktop/Work/LLM-testing/.venv/bin:/usr/local/bin:/usr/bin:/bin",
+    "CLAUDE_CONFIG_DIR": "/Users/zzy/Desktop/Work/LLM-testing/runs/glm/vague/1/claude_config",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "128000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_BASE_URL": "https://ark.cn-beijing.volces.com/api/compatible",
+    "ANTHROPIC_AUTH_TOKEN": "<redacted>",
+    "ANTHROPIC_MODEL": "glm-5-2-260617",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-5-2-260617",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5-2-260617",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5-2-260617",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "glm-5-2-260617"
+  },
+  "out_dir_exists": true,
+  "vision": false,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/zzy/Desktop/Work/LLM-testing/.venv/bin/python /Users/zzy/Desktop/Work/LLM-testing/scripts/hooks/block_image_read.py"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,103 @@
+# Endpoints and prices for the benchmark. Secrets come from .env via ${VAR}.
+# Verified 2026-09-10 with scripts/probe_endpoints.py + scripts/smoke_cc.py (see VERIFY.md).
+#
+# common_env is merged into every model's env first. The *_DEFAULT_*_MODEL and
+# SUBAGENT overrides make every request of a run (main loop, subagents, background
+# helpers that would otherwise ask for "haiku") hit the model under test; the
+# NONESSENTIAL_TRAFFIC flag keeps Claude Code telemetry off the vendor endpoint.
+common_env:
+  CLAUDE_CODE_MAX_OUTPUT_TOKENS: "128000"
+  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+
+models:
+  evolving:
+    label: Doubao-Seed-Evolving
+    enabled: true
+    vision: true
+    env:
+      ANTHROPIC_BASE_URL: https://ark.cn-beijing.volces.com/api/compatible
+      ANTHROPIC_AUTH_TOKEN: ${ARK_KEY_EVOLVING}
+      ANTHROPIC_MODEL: doubao-seed-evolving
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: doubao-seed-evolving
+      ANTHROPIC_DEFAULT_SONNET_MODEL: doubao-seed-evolving
+      ANTHROPIC_DEFAULT_OPUS_MODEL: doubao-seed-evolving
+      CLAUDE_CODE_SUBAGENT_MODEL: doubao-seed-evolving
+    price_per_m: {input: 6.0, cache_read: 1.2, output: 30.0, currency: CNY}
+    notes: Ark pay-as-you-go Anthropic-compatible route; server echoes model as doubao-seed-evolving-latest-version.
+
+  deepseek:
+    label: DeepSeek-V4-Pro (Ark)
+    enabled: true
+    vision: false   # Ark answers 400 "Model do not support image input" (seen 2026-09-10); run_one.py installs a hook that blocks Read on images
+    env:
+      ANTHROPIC_BASE_URL: https://ark.cn-beijing.volces.com/api/compatible
+      ANTHROPIC_AUTH_TOKEN: ${ARK_KEY_DEEPSEEK}
+      ANTHROPIC_MODEL: deepseek-v4-pro-ga-260813
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: deepseek-v4-pro-ga-260813
+      ANTHROPIC_DEFAULT_SONNET_MODEL: deepseek-v4-pro-ga-260813
+      ANTHROPIC_DEFAULT_OPUS_MODEL: deepseek-v4-pro-ga-260813
+      CLAUDE_CODE_SUBAGENT_MODEL: deepseek-v4-pro-ga-260813
+    price_per_m: {input: 9.0, cache_read: 0.3, output: 27.0, currency: CNY}
+
+  glm:
+    label: GLM-5.2 (Ark)
+    enabled: true
+    vision: false   # same 400 as deepseek (seen 2026-09-10)
+    env:
+      ANTHROPIC_BASE_URL: https://ark.cn-beijing.volces.com/api/compatible
+      ANTHROPIC_AUTH_TOKEN: ${ARK_KEY_GLM}
+      ANTHROPIC_MODEL: glm-5-2-260617
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: glm-5-2-260617
+      ANTHROPIC_DEFAULT_SONNET_MODEL: glm-5-2-260617
+      ANTHROPIC_DEFAULT_OPUS_MODEL: glm-5-2-260617
+      CLAUDE_CODE_SUBAGENT_MODEL: glm-5-2-260617
+    price_per_m: {input: 8.0, cache_read: 2.0, output: 28.0, currency: CNY}
+    notes: Replaces Kimi K3 as the third domestic competitor (user decision 2026-09-10).
+
+  kimi:
+    label: Kimi K3 (Xinghuo relay)
+    enabled: false
+    env:
+      ANTHROPIC_BASE_URL: https://xh.v1api.cc
+      ANTHROPIC_AUTH_TOKEN: ${XINGHUO_KEY}
+      ANTHROPIC_MODEL: kimi-k3
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: kimi-k3
+      ANTHROPIC_DEFAULT_SONNET_MODEL: kimi-k3
+      ANTHROPIC_DEFAULT_OPUS_MODEL: kimi-k3
+      CLAUDE_CODE_SUBAGENT_MODEL: kimi-k3
+    price_per_m: {input: 3.0, cache_read: 0.3, output: 15.0, currency: USD}
+    notes: >-
+      2026-09-10 probe: relay lists kimi-k3 but POST /v1/messages returns 503 model_not_found
+      ("分组 cn-vip 下模型 kimi-k3 无可用渠道"). Price is Moonshot list price, relay price unknown (VERIFY).
+      Re-enable once the relay has a channel or a direct Moonshot key is supplied.
+
+  evolving_pinned:
+    label: Doubao-Seed-2.1-pro (pinned control)
+    enabled: false   # not in the matrix (user decision 2026-09-10); kept for an optional Phase 6 control
+    env:
+      ANTHROPIC_BASE_URL: https://ark.cn-beijing.volces.com/api/compatible
+      ANTHROPIC_AUTH_TOKEN: ${ARK_KEY_EVOLVING}
+      ANTHROPIC_MODEL: doubao-seed-2-1-pro-260628
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: doubao-seed-2-1-pro-260628
+      ANTHROPIC_DEFAULT_SONNET_MODEL: doubao-seed-2-1-pro-260628
+      ANTHROPIC_DEFAULT_OPUS_MODEL: doubao-seed-2-1-pro-260628
+      CLAUDE_CODE_SUBAGENT_MODEL: doubao-seed-2-1-pro-260628
+    price_per_m: {input: 6.0, cache_read: 1.2, output: 30.0, currency: CNY}
+    notes: Availability on the Ark account not probed.
+
+  opus:
+    label: Claude Opus 5 (ceiling)
+    enabled: false   # not run by the harness: the user runs Opus in their own logged-in Claude Code and scores out/ with check.py
+    auth: oauth   # if re-enabled: no BASE_URL/AUTH_TOKEN; run_one.py allow-lists CLAUDE_CODE_OAUTH_TOKEN from .env
+    env:
+      ANTHROPIC_MODEL: claude-opus-5
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: claude-opus-5
+      ANTHROPIC_DEFAULT_SONNET_MODEL: claude-opus-5
+      ANTHROPIC_DEFAULT_OPUS_MODEL: claude-opus-5
+      CLAUDE_CODE_SUBAGENT_MODEL: claude-opus-5
+    price_per_m: {input: 5.0, cache_read: 0.5, cache_write: 10.0, output: 25.0, currency: USD}
+    notes: >-
+      List price (Claude API reference, 2026-06); Max subscription is flat-rate so cost is list-price-equivalent.
+      cache_read = 10% of input; cache_write = 2x input because Claude Code uses 1-hour ephemeral cache
+      (usage.cache_creation.ephemeral_1h_input_tokens in the transcripts). With these prices cost.py matches
+      the /cost figure Claude Code showed the user to within 2% (VERIFY 63).

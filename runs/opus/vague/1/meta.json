@@ -1,0 +1,22 @@
+{
+  "run_id": "opus/vague/1",
+  "week": "",
+  "model": "opus",
+  "label": "Claude Opus 5 (ceiling)",
+  "prompt": "vague",
+  "n": 1,
+  "start": 1789050776.831,
+  "end": 1789052066.835,
+  "start_iso": "2026-09-10T22:32:56",
+  "end_iso": "2026-09-10T22:54:26",
+  "wall_s": 1290.0,
+  "exit_code": 0,
+  "timed_out": false,
+  "effort": "high",
+  "source": "interactive session (imported)",
+  "transcript": "/Users/zzy/.claude/projects/-Users-zzy-tests-opus-vague/12ed5426-82e8-461d-aa6e-982f0fc954a1.jsonl",
+  "src": "/Users/zzy/tests/opus-vague",
+  "model_reported": "claude-opus-5",
+  "out_dir_exists": true,
+  "vision": true
+}

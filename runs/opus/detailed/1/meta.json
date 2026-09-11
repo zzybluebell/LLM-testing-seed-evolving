@@ -1,0 +1,22 @@
+{
+  "run_id": "opus/detailed/1",
+  "week": "",
+  "model": "opus",
+  "label": "Claude Opus 5 (ceiling)",
+  "prompt": "detailed",
+  "n": 1,
+  "start": 1789052198.34,
+  "end": 1789053224.603,
+  "start_iso": "2026-09-10T22:56:38",
+  "end_iso": "2026-09-10T23:13:44",
+  "wall_s": 1026.3,
+  "exit_code": 0,
+  "timed_out": false,
+  "effort": "high",
+  "source": "interactive session (imported)",
+  "transcript": "/Users/zzy/.claude/projects/-Users-zzy-tests-opus-detailed/ad036b37-7cab-452c-9b7e-7eb0dd94dfda.jsonl",
+  "src": "/Users/zzy/tests/opus-detailed",
+  "model_reported": "claude-opus-5",
+  "out_dir_exists": true,
+  "vision": true
+}

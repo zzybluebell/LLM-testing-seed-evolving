@@ -1,0 +1,85 @@
+{
+  "model": "deepseek",
+  "prompt": "vague",
+  "n": "1",
+  "out_dir": "runs/deepseek/vague/1/work/out",
+  "checks": {
+    "c01_pptx_opens": true,
+    "c02_slide_count_8_12": true,
+    "c03_pictures_ge_2": true,
+    "c04_table_ge_5_rows": true,
+    "c05_cac_ltv_payback_on_slides": true,
+    "c06_no_placeholder_text": true,
+    "c07_xlsx_sheets": false,
+    "c08_npv_0_5pct": false,
+    "c09_irr_0_1pp": false,
+    "c10_loan_60_rows_interest_0_5pct": false,
+    "c11_formula_ratio_ge_0_5": false,
+    "c12_five_slide_numbers_match_xlsx": false,
+    "c13_slide7_conflict_flagged": true
+  },
+  "checks_passed": 7,
+  "errors": {
+    "CAC_slide_rel": 0.0,
+    "LTV_slide_rel": 0.0,
+    "payback_slide_rel": 0.00036,
+    "NPV_rel": null,
+    "IRR_pp": null,
+    "total_interest_rel": null
+  },
+  "xlsx_errors": {
+    "CAC": 0.0,
+    "LTV": 0.0,
+    "payback": 0.000362,
+    "ARPA": 0.0
+  },
+  "formula_ratio": 0.0,
+  "eval_path": "cached",
+  "stats": {
+    "slide_count": 9,
+    "picture_count": 5,
+    "max_table_rows": 5,
+    "sheets": [
+      "README",
+      "Raw Data",
+      "Monthly Model",
+      "Assumptions",
+      "Quarterly",
+      "KPIs"
+    ],
+    "sheet_fallback": [
+      "unit_economics",
+      "dcf",
+      "loan"
+    ],
+    "CAC_cell": "KPIs!B15",
+    "LTV_cell": "KPIs!B30",
+    "payback_cell": "KPIs!B31",
+    "ARPA_cell": "Monthly Model!G37",
+    "loan_rows": 0,
+    "formula_ratio_sheets": [
+      "README",
+      "Monthly Model",
+      "Assumptions",
+      "Quarterly",
+      "KPIs"
+    ],
+    "formula_cells": 0,
+    "numeric_cells": 702,
+    "slide_xlsx_matches": [
+      "CAC",
+      "LTV",
+      "payback",
+      "ARPA"
+    ],
+    "slide7_cac_mentioned": true,
+    "slide7_conflict_wording": true
+  },
+  "notes": [
+    "c07: missing sheets ['unit_economics', 'dcf', 'loan']",
+    "c08: NPV missing",
+    "c09: IRR missing",
+    "c10: total interest missing",
+    "c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+  ]
+}

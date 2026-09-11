@@ -1,0 +1,55 @@
+==============================================================================
+VERIFICATION CHECKLIST — investor_update.pptx vs model.xlsx
+==============================================================================
+[PASS] model.xlsx has sheets raw/unit_economics/dcf/loan
+[PASS] raw header
+[PASS] raw has 36 monthly rows
+[PASS] model.xlsx raw identical to source financials.xlsx
+[PASS] live formula: ue B6 active recurrence
+[PASS] live formula: ue B41 active recurrence
+[PASS] live formula: ue C6 GM
+[PASS] live formula: ue D6 churn
+[PASS] live formula: ue G7 CAC
+[PASS] live formula: ue G12 ARPA
+[PASS] live formula: ue G13 LTV
+[PASS] live formula: ue G14 LTV/CAC
+[PASS] live formula: ue G15 payback
+[PASS] live formula: dcf B5 rev0
+[PASS] live formula: dcf B16 NPV
+[PASS] live formula: dcf B17 IRR
+[PASS] live formula: loan B6 PMT
+[PASS] live formula: loan B73 total interest
+[PASS] unit_economics summary G5:G15 all formulas
+[PASS] deck has 11 slides (8–12 required)
+[PASS] one expectation block per slide
+[PASS] python truth matches xlsx-recomputed: cac
+[PASS] python truth matches xlsx-recomputed: arpa
+[PASS] python truth matches xlsx-recomputed: avg_gm
+[PASS] python truth matches xlsx-recomputed: avg_churn
+[PASS] python truth matches xlsx-recomputed: ltv
+[PASS] python truth matches xlsx-recomputed: ltv_cac
+[PASS] python truth matches xlsx-recomputed: payback
+[PASS] DCF NPV consistent
+[PASS] DCF IRR consistent
+[PASS] loan payment/interest consistent
+[PASS] loan final balance ~0
+[PASS] slide 1 (title): all 3 expected values present
+[PASS] slide 2 (executive summary): all 17 expected values present
+[PASS] slide 3 (mrr): all 4 expected values present
+[PASS] slide 4 (gross margin): all 9 expected values present
+[PASS] slide 5 (customers): all 6 expected values present
+[PASS] slide 6 (unit economics): all 11 expected values present
+[PASS] slide 7 (dcf): all 27 expected values present
+[PASS] slide 8 (loan): all 10 expected values present
+[PASS] slide 9 (use of funds): all 10 expected values present
+[PASS] slide 10 (appendix A): all 25 expected values present
+[PASS] slide 11 (appendix B): all 12 expected values present
+[PASS] appendix B references $1,583
+[PASS] appendix B references $8,019.93
+[PASS] appendix B references 6.44
+[PASS] appendix B references $236.27
+[PASS] appendix B references 6.84
+[PASS] appendix B references 1,172.91
+[PASS] every dollar amount on slides traces to model.xlsx (±$1)
+------------------------------------------------------------------------------
+50/50 checks passed

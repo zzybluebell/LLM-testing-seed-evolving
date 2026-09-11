@@ -1,0 +1,24 @@
+{
+  "currency": "USD",
+  "cost_native": 6.0614,
+  "cost_usd": 6.0614,
+  "prices_per_m": {
+    "input": 5.0,
+    "cache_read": 0.5,
+    "cache_write": 10.0,
+    "output": 25.0,
+    "currency": "USD"
+  },
+  "tokens": {
+    "input_tokens": 92,
+    "cache_read_input_tokens": 4771165,
+    "cache_creation_input_tokens": 190926,
+    "output_tokens": 70645
+  },
+  "fx_cny_per_usd": 7.15,
+  "checks_passed": 13,
+  "cost_per_passed_check": 0.4663,
+  "claude_reported_total_cost_usd": null,
+  "result_output_tokens": null,
+  "output_tokens_mismatch": false
+}

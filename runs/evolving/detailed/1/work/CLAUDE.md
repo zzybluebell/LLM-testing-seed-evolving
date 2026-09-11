@@ -1,0 +1,1 @@
+You are working in an isolated directory. Python 3 is available in a virtualenv on PATH with python-pptx, openpyxl, matplotlib and numpy-financial installed. Write all deliverables under ./out/. Do not ask the user questions; make reasonable assumptions and state them in your final message. Finish the task fully before stopping.

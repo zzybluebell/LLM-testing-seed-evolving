@@ -1,0 +1,38 @@
+scored_at,model,prompt,n,passed,c01_pptx_opens,c02_slide_count_8_12,c03_pictures_ge_2,c04_table_ge_5_rows,c05_cac_ltv_payback_on_slides,c06_no_placeholder_text,c07_xlsx_sheets,c08_npv_0_5pct,c09_irr_0_1pp,c10_loan_60_rows_interest_0_5pct,c11_formula_ratio_ge_0_5,c12_five_slide_numbers_match_xlsx,c13_slide7_conflict_flagged,wall_s,tokens,cost_usd,notes
+2026-09-10T23:52:56,opus,vague,1,8/13,1,1,1,1,1,1,0,0,0,0,1,0,1,1299 (api 835),in 200 / out 69.6k / cache_read 5.8m / cache_write 180.1k,6.43,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-10T23:52:58,opus,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,1981 (api 818),in 186 / out 70.7k / cache_read 5.0m / cache_write 192.3k,6.18,
+2026-09-10T23:52:59,deepseek,vague,1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,2308 (model 2291),in 95.6k / out 53.9k / cache_read 1.50m,0.387 (CNY 2.77),"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-10T23:53:02,glm,vague,1,7/13,1,1,1,0,1,1,0,0,0,0,1,0,1,2080 (model 2068),in 86.0k / out 39.7k / cache_read 1.09m,0.556 (CNY 3.97),"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T00:56:15,deepseek,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,4656 (model 4637),in 174.8k / out 83.2k / cache_read 4.18m,0.7094 (CNY 5.072),
+2026-09-11T00:56:16,glm,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,3982 (model 3951),in 176.5k / out 43.6k / cache_read 2.49m,1.0639 (CNY 7.607),
+2026-09-11T02:05:47,evolving,vague,1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-11T02:10:30,evolving,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T02:12:28,evolving,vague,1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-11T02:12:28,evolving,vague,1_failed_attempt1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-11T02:12:29,evolving,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T02:12:30,evolving,detailed,1_failed_attempt1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T02:12:30,deepseek,vague,1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-11T02:12:31,glm,vague,1,7/13,1,1,1,0,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T02:12:32,LLM-testing,tests,reference_run,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T02:22:15,deepseek,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T02:28:01,glm,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:33:58,opus,vague,1,8/13,1,1,1,1,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:34:00,opus,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:36:08,opus,vague,1,8/13,1,1,1,1,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:36:10,opus,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:40:39,evolving,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:40:41,deepseek,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:40:44,glm,vague,1,7/13,1,1,1,0,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:40:46,glm,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:40:49,opus,vague,1,8/13,1,1,1,1,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:40:51,opus,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:40:52,LLM-testing,tests,reference_run,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:41:25,evolving,vague,1,9/13,1,1,1,1,1,1,0,0,0,0,1,1,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing"
+2026-09-11T08:41:27,evolving,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:41:28,deepseek,vague,1,7/13,1,1,1,1,1,1,0,0,0,0,0,0,1,,,,"c07: missing sheets ['unit_economics', 'dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:41:30,deepseek,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:41:32,glm,vague,1,7/13,1,1,1,0,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:41:34,glm,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:41:37,opus,vague,1,8/13,1,1,1,1,1,1,0,0,0,0,1,0,1,,,,"c07: missing sheets ['dcf', 'loan'] | c08: NPV missing | c09: IRR missing | c10: total interest missing | c12: only 4 model.xlsx metrics appear on slides: ['CAC', 'LTV', 'payback', 'ARPA']"
+2026-09-11T08:41:39,opus,detailed,1,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,
+2026-09-11T08:41:40,LLM-testing,tests,reference_run,13/13,1,1,1,1,1,1,1,1,1,1,1,1,1,,,,

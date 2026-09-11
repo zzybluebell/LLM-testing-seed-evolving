@@ -1,0 +1,85 @@
+{
+  "model": "LLM-testing",
+  "prompt": "tests",
+  "n": "reference_run",
+  "out_dir": "tests/reference_run/work/out",
+  "checks": {
+    "c01_pptx_opens": true,
+    "c02_slide_count_8_12": true,
+    "c03_pictures_ge_2": true,
+    "c04_table_ge_5_rows": true,
+    "c05_cac_ltv_payback_on_slides": true,
+    "c06_no_placeholder_text": true,
+    "c07_xlsx_sheets": true,
+    "c08_npv_0_5pct": true,
+    "c09_irr_0_1pp": true,
+    "c10_loan_60_rows_interest_0_5pct": true,
+    "c11_formula_ratio_ge_0_5": true,
+    "c12_five_slide_numbers_match_xlsx": true,
+    "c13_slide7_conflict_flagged": true
+  },
+  "checks_passed": 13,
+  "errors": {
+    "CAC_slide_rel": 0.0,
+    "LTV_slide_rel": 0.0,
+    "payback_slide_rel": 0.00036,
+    "NPV_rel": 0.0,
+    "IRR_pp": 0.0,
+    "total_interest_rel": 0.0
+  },
+  "xlsx_errors": {
+    "CAC": 0.0,
+    "LTV": 0.0,
+    "LTV/CAC": 0.0,
+    "payback": 0.0,
+    "ARPA": 0.0,
+    "NPV": 0.0,
+    "IRR": 0.0,
+    "total_interest": 0.0,
+    "PMT": 0.0
+  },
+  "formula_ratio": 0.8799,
+  "eval_path": "formulas",
+  "stats": {
+    "slide_count": 9,
+    "picture_count": 2,
+    "max_table_rows": 6,
+    "sheets": [
+      "raw",
+      "unit_economics",
+      "dcf",
+      "loan"
+    ],
+    "sheet_fallback": [],
+    "CAC_cell": "unit_economics!B42",
+    "LTV_cell": "unit_economics!B46",
+    "LTV/CAC_cell": "unit_economics!B47",
+    "payback_cell": "unit_economics!B48",
+    "ARPA_cell": "unit_economics!B43",
+    "NPV_cell": "dcf!B12",
+    "IRR_cell": "dcf!B13",
+    "total_interest_cell": "loan!B70",
+    "PMT_cell": "loan!B5",
+    "loan_rows": 60,
+    "formula_ratio_sheets": [
+      "unit_economics",
+      "dcf",
+      "loan"
+    ],
+    "formula_cells": 447,
+    "numeric_cells": 508,
+    "slide_xlsx_matches": [
+      "CAC",
+      "LTV",
+      "payback",
+      "ARPA",
+      "NPV",
+      "IRR",
+      "total_interest",
+      "PMT"
+    ],
+    "slide7_cac_mentioned": true,
+    "slide7_conflict_wording": true
+  },
+  "notes": []
+}

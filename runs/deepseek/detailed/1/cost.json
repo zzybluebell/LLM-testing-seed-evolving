@@ -1,0 +1,21 @@
+{
+  "currency": "CNY",
+  "cost_native": 4.0852,
+  "cost_usd": 0.5714,
+  "prices_per_m": {
+    "input": 9.0,
+    "cache_read": 0.3,
+    "output": 27.0,
+    "currency": "CNY"
+  },
+  "tokens": {
+    "input_tokens": 115194,
+    "cache_read_input_tokens": 3352064,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 75662
+  },
+  "fx_cny_per_usd": 7.15,
+  "checks_passed": 13,
+  "cost_per_passed_check": 0.044,
+  "claude_reported_total_cost_usd": 4.143552000000001
+}
