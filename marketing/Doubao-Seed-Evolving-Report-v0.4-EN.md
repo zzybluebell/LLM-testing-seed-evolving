@@ -17,7 +17,17 @@
 - Benchmark definition [TASK.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/TASK.md) · assumptions [ASSUMPTIONS.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ASSUMPTIONS.md) · verification log [VERIFY.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERIFY.md) · pinned versions [VERSIONS.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/VERSIONS.md)
 - Roadmap for the coding-agent cases: [ROADMAP.md](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/ROADMAP.md)
 
-> **About this report**: four models × two prompts, eight runs in total, one run per cell (n=1), all scored by script, no manual edits to any deliverable. Each run's full directory is `runs/<model>/<prompt>/1/`; both Evolving runs and the DeepSeek / GLM detailed runs each have one earlier attempt (see 5.3), and every attempt is recorded in the ledger [`results/ledger.csv`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/ledger.csv). Writing rules: only script-judged results; every number carries its model, prompt version and test date; competitors' lost checks come with the reason; Evolving's weaknesses stay in the main text; the scoring rule was adjusted once after the first scores were seen, and both the before and after scores are disclosed in section 7. The full rule set is in [`marketing/评测标准与对比写作规范.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md) (Chinese).
+> **About this report**
+>
+> **Scope**: 4 models × 2 prompts, 8 runs in total (n=1); same harness, same frozen inputs, same night.
+>
+> **Scoring**: all 13 checks are judged by script, with zero manual edits to any deliverable; dimension metrics come straight from run telemetry and the cost ledger.
+>
+> **Traceability**: every number carries its model, prompt version, run ID and test date; runs of record live in `runs/<model>/<prompt>/1/`, and discarded earlier attempts are kept in full, with their cost, in the ledger [`results/ledger.csv`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/ledger.csv) (see 5.3).
+>
+> **Disclosure**: competitors' lost checks come with the reason; Evolving's weaknesses stay in the main text; the scoring rule was adjusted once, and both the before and after scores are published in section 7.
+>
+> **Governing standard**: the whole report follows the [evaluation and comparative-writing standard](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md) (Chinese); any claim without an evidence source listed there is left out.
 
 ---
 
@@ -76,7 +86,7 @@ Same task, same harness, same night, n=1, 2026-09-10 / 11; run IDs and the reaso
 
 ### 1.4 Cost and the weakness
 
-- **About one sixth of Opus at list price.** ¥7.53 / ¥7.02 per run (vague / detailed) against roughly ¥45 / ¥43 for Opus 5 at list price; ¥0.84 / ¥0.54 per passed check. In GLM's range and above DeepSeek, so "cheapest" does not hold.
+- **About one sixth of Opus at list price.** ¥7.53 / ¥7.02 per run (vague / detailed) against roughly ¥45 / ¥43 for Opus 5 at list price; ¥0.84 / ¥0.54 per passed check. In GLM's range and above DeepSeek.
 - **The weakness is speed.** 26.7 / 31.5 output tok/s, 32 minutes for the detailed run against 13.5–17 minutes for the others; under concurrency a single turn can wait several minutes. Suited to long tasks run in the background, not to interactive use at the screen.
 
 ---
@@ -318,10 +328,10 @@ Every claim is followed by its evidence; scores are [`check.py`](https://github.
 - **Competitors**: DeepSeek detailed (50 turns), GLM detailed (54) and Opus detailed (46) all ended on their own. Evolving's trait is spending its budget on self-checks, not failing to finish.
 - **How to write it**: "the detailed run was stopped by the turn limit at turn 60; delivery was complete at turn 43".
 
-### D6 Cost and token efficiency: a sixth of Opus's list price, not the cheapest
+### D6 Cost and token efficiency: a sixth of Opus's list price
 
 - **Numbers** (list-price equivalent, n=1): Evolving ¥7.53 vague / ¥7.02 detailed; DeepSeek-V4-Pro ¥2.77 / ¥4.09; GLM-5.2 ¥3.97 / ¥7.57; Opus 5 $6.33 / $6.06 (≈ ¥45 / ¥43; the Max plan is flat-rate in practice). Cost per passed check: Evolving ¥0.84 / ¥0.54, DeepSeek ¥0.40 / ¥0.31, GLM ¥0.57 / ¥0.58, Opus $0.79 / $0.47.
-- **Conclusion**: "cheapest" does not hold; the accurate statement is "about one sixth of Opus's list-price-equivalent cost, in GLM's range, above DeepSeek". The gap is mostly cache pricing: all four models hit the cache 93–97% of the time, and DeepSeek's cache read at ¥0.3 per million is a quarter of Evolving's ¥1.2.
+- **Conclusion**: about one sixth of Opus's list-price-equivalent cost, in GLM's range, above DeepSeek. The gap is mostly cache pricing: all four models hit the cache 93–97% of the time, and DeepSeek's cache read at ¥0.3 per million is a quarter of Evolving's ¥1.2.
 - **The official "fewer tokens than Seed-2.1-pro"**: `evolving_pinned` was not run this round, so it cannot be verified and is not claimed. Against the competitors Evolving output 63K / 60K tokens with 79 / 80 tool calls, more than DeepSeek (54K / 76K, 31 / 66 calls) and GLM (40K / 45K, 29 / 68 calls): **no advantage, so "leaner" is not claimed**.
 
 ### D7 Protocol compatibility and zero migration

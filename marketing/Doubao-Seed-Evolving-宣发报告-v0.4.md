@@ -8,7 +8,17 @@
 **版本**：v0.4  
 **English edition**：[Here](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/Doubao-Seed-Evolving-Report-v0.4-EN.md)
 
-> **关于本报告**：四个模型 × 两份提示词共 8 次运行，每个组合各运行一次（n=1），全部由脚本打分，产物未经人工修改。每次运行的完整目录为 `runs/<模型>/<提示词>/1/`；Evolving 的两次运行与 DeepSeek / GLM 的详细版各有一次更早的尝试（见 5.3），所有尝试都记录在账本 [`results/ledger.csv`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/ledger.csv)。写作原则：只写脚本判定的结果；每个数字标注模型、提示词版本和测试日期；对手的失分写明原因；Evolving 的短板写在正文；打分规则在看到首批分数后调整过一次，调整前后的分数均在第 7 节公开。完整规范见 [`marketing/评测标准与对比写作规范.md`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md)。
+> **关于本报告**
+>
+> **测试范围**：4 个模型 × 2 份提示词，共 8 次运行（n=1）；同一 harness、同一冻结输入、同一晚完成。
+>
+> **评分方式**：13 项验收全部由脚本判定，产物零人工修改；维度指标直接取自运行遥测与成本账本。
+>
+> **可追溯性**：每个数字均标注模型、提示词版本、run_id 与测试日期；记录运行存于 `runs/<模型>/<提示词>/1/`，作废的早期尝试连同费用完整保留于账本 [`results/ledger.csv`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/ledger.csv)（见 5.3）。
+>
+> **披露原则**：对手失分写明原因；Evolving 的短板写在正文；打分规则调整过一次，调整前后的分数均在第 7 节公开。
+>
+> **执行规范**：全文遵循 [《评测标准与对比写作规范》](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/marketing/%E8%AF%84%E6%B5%8B%E6%A0%87%E5%87%86%E4%B8%8E%E5%AF%B9%E6%AF%94%E5%86%99%E4%BD%9C%E8%A7%84%E8%8C%83.md)，规范中未列出证据来源的主张一律不写。
 
 ---
 
@@ -67,7 +77,7 @@
 
 ### 1.4 成本与短板
 
-- **成本是 Opus 牌价的约六分之一。** 每次运行 ¥7.53 / ¥7.02（模糊 / 详细），Opus 5 按牌价折算约 ¥45 / ¥43；每通过一项验收 ¥0.84 / ¥0.54。与 GLM 同档，高于 DeepSeek，"最省钱"不成立。
+- **成本是 Opus 牌价的约六分之一。** 每次运行 ¥7.53 / ¥7.02（模糊 / 详细），Opus 5 按牌价折算约 ¥45 / ¥43；每通过一项验收 ¥0.84 / ¥0.54。与 GLM 同档，高于 DeepSeek。
 - **短板是速度。** 出字 26.7 / 31.5 tok/s，详细版整轮 32 分钟，对手 13.5–17 分钟；并发时单轮等待可达数分钟。适合放在后台跑的长任务，不适合等在屏幕前的交互场景。
 
 ---
@@ -309,10 +319,10 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 - **对手**：DeepSeek detailed 50 轮、GLM detailed 54 轮、Opus detailed 46 轮都自行结束。Evolving 的特点是把预算花在自检上，不是做不完。
 - **写法**：如实写"详细版在第 60 轮被上限截停，交付已在第 43 轮完成"。
 
-### D6 成本与 token 效率：Opus 牌价的六分之一，不是最省
+### D6 成本与 token 效率：Opus 牌价的六分之一
 
 - **数字**（列表价折算，n=1）：Evolving 模糊版 ¥7.53、详细版 ¥7.02；DeepSeek-V4-Pro ¥2.77 / ¥4.09；GLM-5.2 ¥3.97 / ¥7.57；Opus 5 $6.33 / $6.06（≈ ¥45 / ¥43，Max 订阅实际包月）。每通过一项验收：Evolving ¥0.84 / ¥0.54，DeepSeek ¥0.40 / ¥0.31，GLM ¥0.57 / ¥0.58，Opus $0.79 / $0.47。
-- **结论**："最省钱"不成立，写"Opus 牌价等价成本的约六分之一，与 GLM 同档，高于 DeepSeek"。差价主要来自缓存单价：四个模型缓存命中率都在 93–97%，DeepSeek 缓存读取 0.3 元/百万是 Evolving 1.2 元的四分之一。
+- **结论**：Opus 牌价等价成本的约六分之一，与 GLM 同档，高于 DeepSeek。差价主要来自缓存单价：四个模型缓存命中率都在 93–97%，DeepSeek 缓存读取 0.3 元/百万是 Evolving 1.2 元的四分之一。
 - **官方"比 Seed-2.1-pro 更省 token"**：本轮没跑 `evolving_pinned`，无法验证，不写。与对手比，Evolving 输出 63K / 60K tokens、工具调用 79 / 80 次，高于 DeepSeek（54K / 76K，31 / 66 次）与 GLM（40K / 45K，29 / 68 次），**无优势，不写"精简"**。
 
 ### D7 协议兼容与零迁移
