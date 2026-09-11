@@ -5,8 +5,8 @@ from pptx.util import Emu
 
 SCALE = 144  # px per inch -> 1920 x 1080
 W_PX, H_PX = 1920, 1080
-REG = '/Users/zzy/Desktop/Work/LLM-testing/.venv/lib/python3.13/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
-BOLD = '/Users/zzy/Desktop/Work/LLM-testing/.venv/lib/python3.13/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf'
+REG = '/home/user/Desktop/Work/LLM-testing/.venv/lib/python3.13/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf'
+BOLD = '/home/user/Desktop/Work/LLM-testing/.venv/lib/python3.13/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf'
 
 _font_cache = {}
 def get_font(pt, bold):

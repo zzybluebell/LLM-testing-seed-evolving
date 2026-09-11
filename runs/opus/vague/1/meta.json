@@ -14,8 +14,8 @@
   "timed_out": false,
   "effort": "high",
   "source": "interactive session (imported)",
-  "transcript": "/Users/zzy/.claude/projects/-Users-zzy-tests-opus-vague/12ed5426-82e8-461d-aa6e-982f0fc954a1.jsonl",
-  "src": "/Users/zzy/tests/opus-vague",
+  "transcript": "/home/user/.claude/projects/-Users-zzy-tests-opus-vague/12ed5426-82e8-461d-aa6e-982f0fc954a1.jsonl",
+  "src": "/home/user/tests/opus-vague",
   "model_reported": "claude-opus-5",
   "out_dir_exists": true,
   "vision": true

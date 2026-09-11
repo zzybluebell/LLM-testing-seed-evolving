@@ -1,5 +1,7 @@
 # Doubao-Seed-Evolving 办公 Agent 实战报告：一个 Case、七个维度、十三项验收
 
+**作者**：Zhiyao Zhang · 邮箱：zhang_zhiyao@outlook.com · 代码与数据：<https://github.com/zzybluebell/LLM-testing-seed-evolving/>
+
 > **v0.3 · 2026-09-11 · 数字定稿（n=1）**
 >
 > **状态**：四个模型 × 两份提示词共 8 次运行全部结束并由脚本打分，所有【待填】已按第 9 节清单回填。"记录运行"是各单元格目录 `runs/<模型>/<提示词>/1/`；Evolving 两次和 DeepSeek / GLM 的详细版都存在更早的一次尝试（见 5.3），账本 `results/ledger.csv` 全部保留。
@@ -10,28 +12,28 @@
 
 ## 0. 导读
 
-这份报告回答一个问题：把 Doubao-Seed-Evolving 接进 Claude Code，让它独立完成一条"读财务数据 → 建带公式的 Excel 模型 → 画图 → 写投资人 PPT → 自检 → 指出旧材料里的错误"的办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
+这份报告回答一个问题：让 Doubao-Seed-Evolving 以 Agent 方式独立完成一条"读财务数据 → 建带公式的 Excel 模型 → 画图 → 写投资人 PPT → 自检 → 指出旧材料里的错误"的办公工作流，它做得怎么样，和 DeepSeek-V4-Pro、GLM-5.2、Claude Opus 5 相比处在什么位置。
 
 七个维度：
 
-| # | 维度 | 一句话 | 状态 |
-|---|---|---|---|
-| D1 | 听懂人话 | 一句话模糊需求下交付了多少 | 已定稿 |
-| D2 | 照 SOP 交付 | 七步详细规格下交付了多少 | 已定稿 |
-| D3 | 数字算得对 | 九个财务指标与真值的误差 | 已定稿 |
-| D4 | 原生看图 | 截图里的错误是"看"出来的还是 OCR 出来的 | 已定稿 |
-| D5 | 长任务不掉链子 | 不回头问、不撞轮数上限、不压缩上下文、自检步骤真做了 | 已定稿 |
-| D6 | 成本与 token 效率 | 每次运行花多少钱、每通过一项验收花多少钱 | 已定稿 |
-| D7 | 协议兼容与零迁移 | 思考链签名往返、三行接入、固定 ID | 已定稿 |
-| — | 速度（短板） | 出字速度、单轮等待 | 已定稿，如实写 |
+| # | 维度 | 测什么 |
+|---|---|---|
+| D1 | 听懂人话 | 一句话模糊需求下交付了多少 |
+| D2 | 照 SOP 交付 | 七步详细规格下交付了多少 |
+| D3 | 数字算得对 | 九个财务指标与真值的误差 |
+| D4 | 原生看图 | 截图里的错误是"看"出来的还是 OCR 出来的 |
+| D5 | 长任务不掉链子 | 不回头问、不撞轮数上限、不压缩上下文、自检步骤真做了 |
+| D6 | 成本与 token 效率 | 每次运行花多少钱、每通过一项验收花多少钱 |
+| D7 | 协议兼容与零迁移 | 思考链签名往返、三行接入、固定 ID |
+| — | 速度（短板） | 出字速度、单轮等待 |
 
-结论一句话：详细规格下四个模型都是 13/13；一句话需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving 在 Claude Code 里**原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
+结论一句话：详细规格下四个模型都是 13/13；一句话需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving **原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
 
 ---
 
 ## 1. 一句话
 
-给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它在 Claude Code 里独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（`evolving/vague/1`，2026-09-11），七步详细规格下通过 **13/13** 项（`evolving/detailed/1`，2026-09-11）。同一任务、同一 harness、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的方舟端点不接受图片，靠 tesseract OCR 补救。
+给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（`evolving/vague/1`，2026-09-11），七步详细规格下通过 **13/13** 项（`evolving/detailed/1`，2026-09-11）。同一任务、同一 Agent 工具、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的 Ark（Volcengine Ark，火山引擎的大模型服务平台）端点不接受图片，靠 tesseract OCR 补救。
 
 ---
 
@@ -44,15 +46,15 @@
 | **固定 ID，原地进化** | 不用版本号，一张模型卡、一个统一 Model ID `doubao-seed-evolving`，周级迭代；接一次，新版本自动生效，不改 ID、不迁端点、不改调用方式。"把模型当 SaaS 而不是软件" | 火山引擎开发者社区文章；腾讯新闻 / AITNT 2026-07-17 |
 | **定位 Coding 与 Agent** | 不追求泛化，专注代码生成与长程任务执行；指令理解、任务拆解、输出稳定性针对 Agent 场景强化 | 同上 |
 | **三大升级** | ① 1M 超长上下文（整仓代码、长文档、跨文件资料）；② 长程任务能力增强：步骤更多、耗时更长、依赖更复杂的任务更稳定；③ token 效率优于 Doubao-Seed-2.1-pro：消耗 token 更少、工具调用轮次更精简 | 火山引擎开发者社区《豆包 Seed-Evolving 强势上线…》；知乎《Doubao-Seed-Evolving 升级：1M 上下文来了！》；搜狐 / 知乎《实测豆包 Seed Evolving：1M 上下文 + 长程稳定》 |
-| **深度思考默认开启** | 由 `thinking` 参数控制；方舟建议 Agent 场景 effort=high、max_tokens ≥ 128K | 方舟文档 |
-| **价格** | 输入 6 元 / 缓存命中 1.2 元 / 输出 30 元（每百万 tokens），按量付费；另有 Coding Plan / Agent Plan 订阅 | 方舟"模型价格"页，2026-09-10 读取 |
-| **Anthropic 协议兼容** | `/api/compatible` 路由；Claude Code 只需 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_MODEL` 三个变量；1M 上下文需要 `[1m]` 后缀 | 方舟文档"接入 AI 工具 › Claude Code"，更新于 2026-08-26 |
+| **深度思考默认开启** | 由 `thinking` 参数控制；Ark 建议 Agent 场景 effort=high、max_tokens ≥ 128K | Ark 文档 |
+| **价格** | 输入 6 元 / 缓存命中 1.2 元 / 输出 30 元（每百万 tokens），按量付费；另有 Coding Plan / Agent Plan 订阅 | Ark "模型价格"页，2026-09-10 读取 |
+| **Anthropic 协议兼容** | `/api/compatible` 路由；接入只需 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_MODEL` 三个变量；1M 上下文需要 `[1m]` 后缀 | Ark 文档"接入 AI 工具 › Claude Code"，更新于 2026-08-26 |
 
-方舟"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）内容由 JavaScript 渲染，脚本抓取不到 Evolving 的更新条目（`ASSUMPTIONS.md` 第 30 条），因此本稿**不引用**该页的更新日志内容；Phase 6 每周复跑时由人工在浏览器里读取后粘贴进 `results/changelog.md`。
+Ark "模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）内容由 JavaScript 渲染，脚本抓取不到 Evolving 的更新条目（`ASSUMPTIONS.md` 第 30 条），因此本稿**不引用**该页的更新日志内容；Phase 6 每周复跑时由人工在浏览器里读取后粘贴进 `results/changelog.md`。
 
 ### 2.2 我们自己做的协议探测（2026-09-10）
 
-Claude Code 每一轮都会把上一轮的思考块原样送回模型，所以"在 Claude Code 里像原生模型一样工作"有一个硬性技术前提：模型必须按 Anthropic 规范返回带 `signature` 的思考块。我们用 `scripts/probe_endpoints.py` 按 Claude Code 的调用方式做了 5 项协议探测；表中“图片输入”一行来自正式运行的观察（`VERIFY.md` 第 47 条）：
+本次所有模型都由同一个 Agent 工具驱动（Claude Code，一个命令行 Agent：把提示词交给模型，替模型执行读文件、跑脚本、写文件等工具调用，并管理多轮对话；下文统称 harness）。这类按 Anthropic 协议工作的工具每一轮都会把上一轮的思考块原样送回模型，所以“接进去就能像原生模型一样工作”有一个硬性技术前提：模型必须按 Anthropic 规范返回带 `signature` 的思考块。我们用 `scripts/probe_endpoints.py` 按 harness 的调用方式做了 5 项协议探测；表中“图片输入”一行来自正式运行的观察（`VERIFY.md` 第 47 条）：
 
 | 探测项 | Evolving | DeepSeek-V4-Pro | GLM-5.2 |
 |---|---|---|---|
@@ -61,9 +63,9 @@ Claude Code 每一轮都会把上一轮的思考块原样送回模型，所以"�
 | **thinking 块带 `signature`** | **✅ 三家唯一** | ❌ | ❌ |
 | 带签名思考链 + 工具结果回传后继续 | ✅ | ✅ | ✅ |
 | 用量字段（input / output / cache_read / cache_creation） | 全有 | 全有 | 全有 |
-| 图片输入（Claude Code `Read` 一张 PNG） | ✅ | ❌ 400 "Model do not support image input" | ❌ 同左 |
+| 图片输入（Agent 用 `Read` 工具读一张 PNG） | ✅ | ❌ 400 "Model do not support image input" | ❌ 同左 |
 
-其它已确认：Claude Code 2.1.231 在完全干净的环境（`env -i` + 白名单 + 独立 `CLAUDE_CONFIG_DIR`）下用 `--effort high` 驱动三个模型端到端成功；方舟第二次请求即命中 13K tokens 缓存；方舟不单独计费缓存写入（`cache_creation_input_tokens` 恒为 0）。来源：`VERIFY.md` 第 1–13、45 条。
+其它已确认：harness（2.1.231 版）在完全干净的环境（`env -i` + 白名单 + 独立 `CLAUDE_CONFIG_DIR`）下用 `--effort high` 驱动三个模型端到端成功；Ark 第二次请求即命中 13K tokens 缓存；Ark 不单独计费缓存写入（`cache_creation_input_tokens` 恒为 0）。来源：`VERIFY.md` 第 1–13、45 条。
 
 ### 2.3 从公开说法到可测维度
 
@@ -75,10 +77,10 @@ Claude Code 每一轮都会把上一轮的思考块原样送回模型，所以"�
 | token 消耗更少、工具调用更精简 | `output_tokens`、`tool_calls`、缓存命中率、每通过一项验收的成本 | D6 |
 | 专注 Coding 与 Agent | 整个任务没有现成模板，全靠模型写 Python 生成 xlsx / pptx / 图，代码质量直接决定 13 项验收 | D1–D3 |
 | 1M 上下文 | 本 case 峰值单请求 < 130K tokens，**未触及**，留给可选的 Phase 5 压力版（`detailed_heavy` + 10 年历史 CSV） | 不测 |
-| 固定 ID、周级迭代 | 同一 case、同一冻结输入、同一 Claude Code 版本，Phase 6 每周复跑画曲线 | D7 |
+| 固定 ID、周级迭代 | 同一 case、同一冻结输入、同一 harness 版本，Phase 6 每周复跑画曲线 | D7 |
 | 深度思考默认开启 | 代价是单轮延迟与出字速度，如实记录 | 速度 |
 
-为什么用 Claude Code 当 harness：方舟官方文档把 Claude Code 列为推荐接入工具，且四个模型都能通过 Anthropic 协议路由跑在**同一个** harness 上，比较的才是模型本身而不是各家 Agent 框架的差异。
+为什么四个模型用同一个 harness：Ark 官方文档把它列为推荐接入工具，且四个模型都能通过 Anthropic 协议路由跑在**同一个** harness 上，比较的才是模型本身而不是各家 Agent 框架的差异。
 
 ---
 
@@ -197,7 +199,7 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 | 出字速度 | `total_output_tokens / model_s` | 跨模型最直观的速度指标（含思考等待） |
 | 四类 tokens、峰值请求 | `total_*_tokens` / `peak_request_tokens` | 上下文增长、离压缩阈值多远 |
 | 缓存命中 | `cache_read / (input + cache_read + cache_creation)` | 长任务成本主要看这里 |
-| 成本 | `cost_native`（按方舟牌价）、`cost_usd`、每通过一项成本 | Claude Code 自己报的 `total_cost_usd` 按 Anthropic 价目算，对方舟模型无意义，必须重算 |
+| 成本 | `cost_native`（按 Ark 牌价）、`cost_usd`、每通过一项成本 | harness 自己报的 `total_cost_usd` 按 Anthropic 价目算，对 Ark 模型无意义，必须重算 |
 | 长任务四件套 | `babysit`、`step_limit_hit`、`compaction_events`、`timed_out` | 不回头问、不撞上限、不压缩、不超时 |
 | 多模态与自检 | `image_reads`、`image_reads_blocked`、`slide7_read`、`slide_exports`、`visual_qa_performed` | 区分"原生读图"和"OCR 补救"；Step 7 有没有真的看回去 |
 | 协议 | `thinking_signature_seen` | 三家国产里只有 Evolving 为 True |
@@ -206,17 +208,17 @@ Do not ask questions; make reasonable assumptions and state them on the appendix
 
 | 模型 | 端点 | 谁来跑 | 说明 |
 |---|---|---|---|
-| Doubao-Seed-Evolving | 方舟 `/api/compatible`，`doubao-seed-evolving` | harness | 主角；滚动 ID，服务端回显 `doubao-seed-evolving-latest-version` |
-| DeepSeek-V4-Pro | 方舟，`deepseek-v4-pro-ga-260813` | harness | 国产对手一；端点不接受图片输入 |
-| GLM-5.2 | 方舟，`glm-5-2-260617` | harness | 国产对手二；端点不接受图片输入；替代无渠道的 Kimi K3 |
-| Claude Opus 5 | Anthropic，`claude-opus-5`，Claude Max 订阅 | 用户在自己登录的 Claude Code 里手动跑 | **天花板参照，不是公平对手**：Claude Code 是 Anthropic 自家 harness |
+| Doubao-Seed-Evolving | Ark `/api/compatible`，`doubao-seed-evolving` | harness | 主角；滚动 ID，服务端回显 `doubao-seed-evolving-latest-version` |
+| DeepSeek-V4-Pro | Ark，`deepseek-v4-pro-ga-260813` | harness | 国产对手一；端点不接受图片输入 |
+| GLM-5.2 | Ark，`glm-5-2-260617` | harness | 国产对手二；端点不接受图片输入；替代无渠道的 Kimi K3 |
+| Claude Opus 5 | Anthropic，`claude-opus-5`，Claude Max 订阅 | 用户在自己登录的 harness 里手动跑 | **天花板参照，不是公平对手**：harness 是 Anthropic 自家的工具 |
 
 保证公平的做法：
 
-- 同一个 harness：Claude Code 2.1.231，同一组 flags，`--effort high`，思考默认开启。
+- 同一个 harness（2.1.231 版），同一组 flags，`--effort high`，思考默认开启。
 - 每次运行独立目录、`env -i` 白名单环境、独立 `CLAUDE_CONFIG_DIR`，用户的全局设置、插件、MCP 都进不去；`ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL` 和 `CLAUDE_CODE_SUBAGENT_MODEL` 都指向被测模型，后台小任务也不会偷偷换模型；关闭非必要遥测。
-- 文本模型的图片问题按"环境限制"而非"模型不会"处理：DeepSeek / GLM 的方舟端点收到图片会 400，且图片留在会话里会让后续每个请求都失败（2026-09-10 观察到 4 次，每次 30–40 秒内死亡）。harness 为 `vision: false` 的模型装一个 `PreToolUse` hook，拦截对图片的 `Read` 并告诉模型"你不能看图，可以用 shell 里的 tesseract OCR"。提示词和 CLAUDE.md 对所有模型一字不改。
-- Opus 由用户手动跑，同版本 Claude Code、同 effort，产出用同一个 `check.py` 打分；耗时和 tokens 取自交互模式 `/cost`。
+- 文本模型的图片问题按"环境限制"而非"模型不会"处理：DeepSeek / GLM 的 Ark 端点收到图片会 400，且图片留在会话里会让后续每个请求都失败（2026-09-10 观察到 4 次，每次 30–40 秒内死亡）。harness 为 `vision: false` 的模型装一个 `PreToolUse` hook，拦截对图片的 `Read` 并告诉模型"你不能看图，可以用 shell 里的 tesseract OCR"。提示词和 CLAUDE.md 对所有模型一字不改。
+- Opus 由用户手动跑，同版本 harness、同 effort，产出用同一个 `check.py` 打分；耗时和 tokens 取自交互模式 `/cost`。
 - n = 1（用户决定，2026-09-10）；无硬超时，只有 `--max-turns 60`（冒烟运行在 40 分钟被杀后决定）。
 - 不修改任何模型产物，不做人工加减分。
 
@@ -254,7 +256,7 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 
 ### D4 原生看图：三家国产里唯一
 
-- **主张**：Evolving 是三家国产模型里唯一在 Claude Code 里原生读图的；截图里的 CAC 错误是"看"出来的，DeepSeek-V4-Pro 和 GLM-5.2 的方舟端点不接受图片（HTTP 400），只能 OCR。
+- **主张**：Evolving 是三家国产模型里唯一原生读图的；截图里的 CAC 错误是"看"出来的，DeepSeek-V4-Pro 和 GLM-5.2 的 Ark 端点不接受图片（HTTP 400），只能 OCR。
 - **证据（会话记录）**：
   - Evolving 两次运行都在第 2–3 轮直接 `Read` 截图，图片块进入模型上下文；全程读图 20 次（模糊版：截图 + 5 张自绘图 + 9 张幻灯片缩略图 + 工作簿预览）和 15 次（详细版：截图 + 3 张图 + 11 张自渲染幻灯片）。
   - DeepSeek / GLM 四次运行：对截图的 `Read` 各被 harness 拦截 1 次（`image_reads_blocked 1`），随后都执行 `tesseract data/last_board_deck_slide7.png stdout`，读出 $1,583 后写进附录；c13 四次都通过。所以 c13 对它们不是不可能，只是要靠 OCR 补救。
@@ -276,7 +278,7 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 
 ### D7 协议兼容与零迁移
 
-- **证据**：探测（2.2）与真实运行一致——Evolving 两次运行 46 / 45 个思考块全部带签名（`thinking_signature_seen True`），DeepSeek / GLM 四次运行全为 False。这意味着 Evolving 的思考链在几十轮工具调用里完整往返，Claude Code 不需要任何降级处理。三行接入见第 8 节；`ANTHROPIC_MODEL=doubao-seed-evolving`，服务端回显 `doubao-seed-evolving-latest-version`。
+- **证据**：探测（2.2）与真实运行一致——Evolving 两次运行 46 / 45 个思考块全部带签名（`thinking_signature_seen True`），DeepSeek / GLM 四次运行全为 False。这意味着 Evolving 的思考链在几十轮工具调用里完整往返，harness 不需要任何降级处理。三行接入见第 8 节；`ANTHROPIC_MODEL=doubao-seed-evolving`，服务端回显 `doubao-seed-evolving-latest-version`。
 - **写法**：周更曲线没跑之前不写"每周变强"，只写"同一 ID 可按周复测"。
 
 ### 速度：如实写的短板
@@ -291,7 +293,7 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 
 ## 5. 结果
 
-### 5.1 总表（n=1；方舟模型 2026-09-10 22:28 至 09-11 02:28，Opus 2026-09-10 22:32 至 23:10）
+### 5.1 总表（n=1；Ark 模型 2026-09-10 22:28 至 09-11 02:28，Opus 2026-09-10 22:32 至 23:10）
 
 | 模型 | 提示词 | 验收 | 模型时间 | 轮数 / 工具调用 | 输出 tokens | 出字 tok/s | 缓存命中 | 峰值请求 | 成本 | 每通过一项 | c13 方式 | Step 7 自检 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -304,7 +306,7 @@ claude -p "<prompt>" --output-format stream-json --verbose --include-partial-mes
 | Claude Opus 5 | vague | 8/9 | 14 min（827 s；墙上 21.5 min） | 53 / 63 | 69.5K | 84.0 | 96.9% | 179K | $6.33 | $0.79 | 原生读图 | 9 页读回 |
 | Claude Opus 5 | detailed | 13/13 | 14 min（811 s；墙上 17.1 min） | 46 / 58 | 70.6K | 87.1 | 96.2% | 187K | $6.06 | $0.47 | 原生读图 | 11 页读回并修 6 处版式 |
 
-run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deepseek/detailed/1`、`glm/vague/1`、`glm/detailed/1`、`opus/vague/1`、`opus/detailed/1`（Opus 由用户在自己的 Claude Code 里手动跑，会话记录经 `scripts/import_manual.py` 导入后与其他运行同一套解析与打分）。成本按各家牌价折算：方舟 Evolving 6 / 1.2 / 30、DeepSeek 9 / 0.3 / 27、GLM 8 / 2 / 28 元每百万（输入 / 缓存命中 / 输出）；Opus $5 / $0.5 / $10（缓存写入）/ $25，与用户会话里 `/cost` 显示的 $6.43 / $6.18 相差 2% 以内，Max 订阅实际为包月。每通过一项按模糊版 9 项、详细版 13 项中的实际通过数计算。
+run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deepseek/detailed/1`、`glm/vague/1`、`glm/detailed/1`、`opus/vague/1`、`opus/detailed/1`（Opus 由用户在自己登录的 harness 里手动跑，会话记录经 `scripts/import_manual.py` 导入后与其他运行同一套解析与打分）。成本按各家牌价折算：Ark Evolving 6 / 1.2 / 30、DeepSeek 9 / 0.3 / 27、GLM 8 / 2 / 28 元每百万（输入 / 缓存命中 / 输出）；Opus $5 / $0.5 / $10（缓存写入）/ $25，与用户会话里 `/cost` 显示的 $6.43 / $6.18 相差 2% 以内，Max 订阅实际为包月。每通过一项按模糊版 9 项、详细版 13 项中的实际通过数计算。
 
 ### 5.2 逐项失分原因（脚本 notes 原文在各 run 的 `check.json`）
 
@@ -323,7 +325,7 @@ run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deep
 
 | 尝试 | 结果 | 为什么不是记录运行 |
 |---|---|---|
-| `evolving/vague/1_failed_attempt1`（09-10 22:15 起） | 3 h 10 min、35 轮、¥4.92，被方舟 "System protection triggered by request burst" 拒绝而中止；对已写出的产出打分 7/13 | 基础设施错误，按规则重试一次 |
+| `evolving/vague/1_failed_attempt1`（09-10 22:15 起） | 3 h 10 min、35 轮、¥4.92，被 Ark "System protection triggered by request burst" 拒绝而中止；对已写出的产出打分 7/13 | 基础设施错误，按规则重试一次 |
 | `evolving/detailed/1_failed_attempt1`（09-10 22:18 起） | 3 h 20 min、60 轮、¥7.64，**13/13**，视觉自检做了 | 当时的重试规则把"跑满 60 轮"误判为失败而重跑；两次都是 13/13，记录运行取 2 路并发下的第二次 |
 | DeepSeek / GLM detailed 首次（09-10 23:06 / 23:24 起） | 78 min、54 轮、¥5.07；66 min、57 轮、¥7.61（账本行） | 被一条带 `--force` 的矩阵命令覆盖后重跑；打分文件已丢失，重跑结果为记录运行 |
 | Evolving detailed 冒烟（09-10 20:20） | 40 分钟硬超时被杀于第 40 轮，12/13（c04：KPI 卡片不是表格） | 之后取消了硬超时 |
@@ -338,7 +340,7 @@ run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deep
 
 ### 6.1 详细版（evolving/detailed/1，32 分钟，60 轮）
 
-1. **第 1–3 轮，先看再算**：列目录、读工作簿，然后直接 `Read` 截图，图片以原生图片块进入上下文。第 4 轮用 Claude Code 的任务清单建了七步任务。
+1. **第 1–3 轮，先看再算**：列目录、读工作簿，然后直接 `Read` 截图，图片以原生图片块进入上下文。第 4 轮用 harness 的任务清单建了七步任务。
 2. **Step 1，算完就找冲突**（第 8–11 轮）：写 `compute.py`，输出后立刻说"LTV、回本、ARPA 与董事会页完全一致，但 CAC $1,583 是错的，更正值 $1,172.91，没有任何 12 个月窗口能得到 $1,583"。
 3. **Step 2，建模再独立重算**（第 12–17 轮）：`build_xlsx.py` 用 openpyxl 生成四张表；然后"模拟每条公式独立重算"，与 Python 结果比对后才标记完成。
 4. **Step 3，图先过配色再画**（第 18–26 轮）：加载 dataviz 技能、校验配色，画完读回两张图，发现 MRR 起点标签与 x 轴刻度相撞，改完再读一次确认。
@@ -363,9 +365,9 @@ run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deep
 
 ## 7. 如实写出的边界
 
-- Claude Code 是 Anthropic 自家 harness，Opus 5 天然占优，它是天花板参照，不是公平对手；Opus 由用户手动跑，其余在 `env -i` 隔离环境里由脚本跑。
+- harness 是 Anthropic 自家的工具，Opus 5 天然占优，它是天花板参照，不是公平对手；Opus 由用户手动跑，其余在 `env -i` 隔离环境里由脚本跑。
 - DeepSeek-V4-Pro 的缓存命中价是 Evolving 的四分之一（0.3 vs 1.2 元），长任务 93–97% 的 tokens 是缓存命中，成本对比要看总账而非单价；GLM-5.2 的缓存价（2.0 元）反而更高。
-- DeepSeek / GLM "看不了图"是方舟端点限制，不是模型不会看图；写成"端点不接受图片输入，需 OCR 补救"。
+- DeepSeek / GLM "看不了图"是 Ark 端点限制，不是模型不会看图；写成"端点不接受图片输入，需 OCR 补救"。
 - Evolving 慢：详细版 32 分钟，是 DeepSeek / GLM 的两倍；单轮等首字最长四分钟；4 路并发时首轮尝试跑了 3 小时以上。这是深度思考的代价，写在正文。
 - **打分规则改过一次**：看到首批分数后给 `check.py` 加了两条兜底——文件名不按 `model.xlsx` / `investor_update.pptx` 时取 `out/` 下的 xlsx / pptx；工作簿没有 `unit_economics` / `dcf` / `loan` 表时在全部非输入表里找指标、算公式占比。前者影响所有模糊版运行的可打分性，后者只把 Evolving 模糊版从 7 提到 9，其余不变（`VERIFY.md` 第 66 条）。
 - **当晚的操作失误**（`VERIFY.md` 第 56 条）：误删过一次跑到一半的 GLM 运行；一条 `--force` 矩阵命令覆盖了 DeepSeek / GLM 已完成的详细版结果并重跑；重试规则把"跑满 60 轮"当失败，把 Evolving 两次都重跑了一遍。记录运行取重跑结果，所有尝试都在账本里。
@@ -383,9 +385,9 @@ run_id：`evolving/vague/1`、`evolving/detailed/1`、`deepseek/vague/1`、`deep
 
 ```bash
 export ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/compatible
-export ANTHROPIC_AUTH_TOKEN=<你的方舟 API Key>
+export ANTHROPIC_AUTH_TOKEN=<你的 Ark API Key>
 export ANTHROPIC_MODEL=doubao-seed-evolving
-claude   # 进入 Claude Code，/status 可确认模型
+claude   # 启动 harness，/status 可确认模型
 ```
 
 复现一次测试（任何人、任何模型，约 5–15 元）：
@@ -428,5 +430,5 @@ cd ~/Desktop/Work/LLM-testing
 - 火山引擎开发者社区：《干货案例：豆包 Seed-Evolving 强势上线，1M 上下文、Coding、长程任务，能打不能打？》（developer.volcengine.com/articles/7665633658704298010）；《Doubao-Seed-Evolving 大模型接入教程》（developer.volcengine.com/articles/7664543704095162387）
 - 知乎：《Doubao-Seed-Evolving 升级：1M 上下文来了！》（zhuanlan.zhihu.com/p/2060789063779620845）；《实测豆包 Seed Evolving：1M 上下文 + 长程稳定，国产模型能扛真活了》（zhuanlan.zhihu.com/p/2064770421728268641，搜狐同文 sohu.com/a/1054997740_115856）
 - AITNT / 腾讯新闻 2026-07-17：《告别版本号！豆包首款无限进步模型：Seed-Evolving 实测》（aitntnews.com/newDetail.html?newId=27330）
-- 火山方舟"模型价格"页（2026-09-10 读取）；方舟文档"接入 AI 工具 › Claude Code"（更新于 2026-08-26）
+- Ark "模型价格"页（2026-09-10 读取）；Ark 文档"接入 AI 工具 › Claude Code"（更新于 2026-08-26）
 - 本仓库：`TASK.md`（基准定义）、`VERIFY.md`（探测与运行记录）、`ASSUMPTIONS.md`（判分与环境假设）、`VERSIONS.md`（版本锁定）、`results/opus-summary.md`（Opus 手动运行记录）、`marketing/评测标准与对比写作规范.md`

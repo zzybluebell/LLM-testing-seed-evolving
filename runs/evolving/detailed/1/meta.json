@@ -29,12 +29,12 @@
     "high"
   ],
   "env": {
-    "HOME": "/Users/zzy",
+    "HOME": "/home/user",
     "LANG": "C.UTF-8",
     "TERM": "xterm-256color",
     "USER": "zzy",
-    "PATH": "/Users/zzy/Desktop/Work/LLM-testing/.venv/bin:/usr/local/bin:/usr/bin:/bin",
-    "CLAUDE_CONFIG_DIR": "/Users/zzy/Desktop/Work/LLM-testing/runs/evolving/detailed/1/claude_config",
+    "PATH": "/home/user/Desktop/Work/LLM-testing/.venv/bin:/usr/local/bin:/usr/bin:/bin",
+    "CLAUDE_CONFIG_DIR": "/home/user/Desktop/Work/LLM-testing/runs/evolving/detailed/1/claude_config",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "128000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "ANTHROPIC_BASE_URL": "https://ark.cn-beijing.volces.com/api/compatible",

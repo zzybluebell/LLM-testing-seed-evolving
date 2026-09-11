@@ -18,9 +18,10 @@ Doubao-Seed-Evolving、DeepSeek、GLM 与 Claude Opus，两份提示词（`vague
 - `prompts/`、`data/`、`truth.json` 冻结的输入与真值（sha256 见 `results/inputs.sha256`）
 - `harness/`、`testkit/` 给被测模型看的工作目录模板（不含真值）
 - `runs/<model>/<prompt>/1/` 每次运行的 `check.json`、`telemetry.json`、`cost.json`、`meta.json` 和产出 `work/out/`。
-  原始对话日志 `session.jsonl`（每个 10–30 MB）和失败的重试目录不入库，见 `.gitignore`
+  原始对话日志 `session.jsonl`（每个 10–30 MB）一并入库；失败的重试目录和 Claude Code 本地状态不入库，见 `.gitignore`。
+  日志中的本机路径已统一替换为 `/home/user`
 - `tests/` 回放用的假 `claude` 夹具与参考运行
-- `marketing/` 评测写作规范与宣发报告草稿
+- `marketing/` 评测写作规范与宣发报告（v0.3 定稿）
 
 ## 快速开始
 

@@ -27,7 +27,7 @@
   "thinking_signature_seen": false,
   "image_reads": 1,
   "image_read_paths": [
-    "/Users/zzy/Desktop/Work/LLM-testing/runs/deepseek/detailed/1/work/data/last_board_deck_slide7.png"
+    "/home/user/Desktop/Work/LLM-testing/runs/deepseek/detailed/1/work/data/last_board_deck_slide7.png"
   ],
   "image_reads_blocked": 1,
   "api_error": null,

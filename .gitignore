@@ -8,9 +8,8 @@ __pycache__/
 *.pyc
 .DS_Store
 
-# run artifacts: keep check.json / telemetry.json / cost.json / meta.json / work/out,
-# drop raw transcripts (tens of MB each), Claude Code state, and failed attempts
-runs/**/session.jsonl
+# run artifacts: keep session.jsonl / check.json / telemetry.json / cost.json / meta.json / work/out,
+# drop live streams, Claude Code local state, and failed attempts
 runs/**/live.jsonl
 runs/**/claude_config/
 runs/**/*_failed_attempt*/
