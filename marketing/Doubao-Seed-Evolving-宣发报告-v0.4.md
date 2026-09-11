@@ -338,7 +338,27 @@ run_id：[`evolving/vague/1`](https://github.com/zzybluebell/LLM-testing-seed-ev
 | DeepSeek / GLM detailed 首次（09-10 23:06 / 23:24 起） | 78 min、54 轮、¥5.07；66 min、57 轮、¥7.61（账本行） | 被一条带 `--force` 的矩阵命令覆盖后重跑；打分文件已丢失，重跑结果为记录运行 |
 | **Evolving detailed 冒烟（09-10 20:20）** | **40 分钟硬超时被杀于第 40 轮，12/13（c04：KPI 卡片不是表格）** | **之后取消了硬超时** |
 
-图（[`scripts/report.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/report.py)）：[`results/charts/lift.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/lift.png)（模糊 vs 详细）、[`results/charts/context_growth.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/context_growth.png)（每轮请求 tokens，缓存部分浅色叠加）、[`results/charts/time_split.png`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/results/charts/time_split.png)（首字 / 模型 / 工具时间）。
+### 5.4 三张结果图
+
+三张图由 [`scripts/report.py`](https://github.com/zzybluebell/LLM-testing-seed-evolving/blob/main/scripts/report.py) 从 8 次记录运行的 `telemetry.json` / `check.json` 自动生成，原图在 [`results/charts/`](https://github.com/zzybluebell/LLM-testing-seed-evolving/tree/main/results/charts)。
+
+**图 1：模糊 vs 详细提示词的验收得分**
+
+![模糊 vs 详细提示词下各模型通过的验收项数](https://raw.githubusercontent.com/zzybluebell/LLM-testing-seed-evolving/main/results/charts/lift.png)
+
+每个模型两根柱：浅色是一句话模糊版，深色是七步详细版，纵轴是通过的验收项数（以 13 计）。详细版四根深色柱全部到顶（13），说明给足规格后四个模型没有差别；差别全在浅色柱：Evolving 9、Opus 8、DeepSeek 与 GLM 各 7。注意模糊版的可得满分是 9（c07–c10 只有详细版要求），所以 Evolving 的 9 是模糊版满分，读法应是 9/9 而不是 9/13。
+
+**图 2：上下文增长（详细版，逐轮）**
+
+![四个模型详细版每一轮请求的 token 数，缓存命中部分为浅色](https://raw.githubusercontent.com/zzybluebell/LLM-testing-seed-evolving/main/results/charts/context_growth.png)
+
+每根柱是一轮请求携带的 token 总量，浅色是缓存命中的部分，深色是本轮新增的输入（工具结果、图片等）。四条曲线都近似线性增长，因为 harness 每轮都把整段对话送回去；93–97% 是浅色，说明成本主要由缓存单价决定（第 7 节）。终点即峰值请求：Evolving 第 60 轮约 108K，DeepSeek 第 50 轮约 116K，GLM 第 54 轮约 78K，Opus 第 46 轮约 187K。Opus 涨得最快，因为它读回了 21 张图片；没有任何一个模型触发上下文压缩。
+
+**图 3：每次运行的时间拆分**
+
+![各模型每次运行的中位耗时，按首字等待、模型时间、工具时间堆叠](https://raw.githubusercontent.com/zzybluebell/LLM-testing-seed-evolving/main/results/charts/time_split.png)
+
+每根柱是该模型两次运行（模糊 + 详细）的中位总耗时，自下而上分成首字等待、模型生成、工具执行三段：Evolving 2,305 s，DeepSeek 1,654 s，GLM 1,574 s，Opus 860 s。三段里模型时间占绝大多数，工具时间只有一条细边（Evolving 模糊版试图用 AppleScript 驱动 PowerPoint 的 5 分钟是最大的一块）。这张图只包含记录运行：Evolving 的两次是凌晨 2 路并发下跑的，DeepSeek / GLM 的模糊版是晚间跑的；晚间 4 路并发下 Evolving 那两次 3 小时以上的首轮尝试（5.3）不在图里。
 
 ---
 
