@@ -59,7 +59,7 @@ cd ~/Desktop/Work/LLM-testing && .venv/bin/python scripts/check.py ~/opus-test/o
 
 结果写到 `~/opus-test/check.json`。Opus 的耗时和 tokens 用交互模式里的 `/cost` 看，手动记下来；对话导出的日志如果能拿到 stream-json 也可以用 `parse_runs.py` 解析。
 
-## 2. 手动测单个方舟模型（可选，和第 0 节的正式路径二选一）
+## 2. 手动测单个 Ark 模型（可选，和第 0 节的正式路径二选一）
 ### 第 1 步：准备测试目录
 
 ```bash
@@ -103,7 +103,7 @@ python3 ~/Desktop/Work/LLM-testing/scripts/manual_run.py detailed   # 五步详�
 - 用你终端里当前的模型配置，非交互地跑 `claude -p <提示词> --effort high --max-turns 60`（自动跳过权限确认，不设时间上限，最多 60 轮）。
 - 每次运行独立目录 `manual_runs/<模型>/<提示词>/<序号>/`，里面 `work/` 是模型的工作区（含数据、CLAUDE.md、产出的 `out/`），`session.jsonl` 是带时间戳的完整事件流。
 - 运行中实时打印每一轮：调用了什么工具、说了什么。
-- 结束后打印两块：**效果**（13 项验收逐项 PASS/FAIL、NPV/IRR/CAC/LTV/回本的误差、公式占比）和**维度**（总耗时、首字延迟、模型时间、工具时间、轮数、工具调用数、input / cache read / cache write / output tokens、峰值请求 tokens、按方舟单价折算的成本）。
+- 结束后打印两块：**效果**（13 项验收逐项 PASS/FAIL、NPV/IRR/CAC/LTV/回本的误差、公式占比）和**维度**（总耗时、首字延迟、模型时间、工具时间、轮数、工具调用数、input / cache read / cache write / output tokens、峰值请求 tokens、按 Ark 单价折算的成本）。
 - 每次一行追加到 `manual_runs/summary.csv`，换模型（`source use_model.sh deepseek`）再跑，同一张表里直接对比：
   ```bash
   column -s, -t < manual_runs/summary.csv
@@ -138,10 +138,10 @@ open manual_runs/evolving/vague/1/work/out/investor_update.pptx manual_runs/evol
 ### 常见问题
 
 - `401` / `authentication`：key 没装进来，重新 `source use_model.sh`，或检查 `.env` 里 `ARK_KEY_EVOLVING=` 非空。
-- `model not found`：`ANTHROPIC_MODEL` 写错，或方舟账号没开通该模型。
+- `model not found`：`ANTHROPIC_MODEL` 写错，或 Ark 账号没开通该模型。
 - 模型说找不到 python-pptx：`manual_run.py` 会自动把项目 `.venv` 放到 PATH 前面；交互模式下需要第 1 步的 `export PATH=...`。
 - 一直转圈不动：模型在思考，Evolving 单轮思考 1–2 分钟属正常；超过 5 分钟按 Ctrl+C。
-- 费用：一次完整运行大约 5–15 元，按方舟账单为准。
+- 费用：一次完整运行大约 5–15 元，按 Ark 账单为准。
 
 
 ## 3. TASK.md 的阶段与状态
@@ -153,11 +153,11 @@ open manual_runs/evolving/vague/1/work/out/investor_update.pptx manual_runs/evol
 | Phase 2 | 冒烟：evolving × detailed 一次；解析、打分、核对遥测；然后停 | 等你说"开始" |
 | Phase 3 | 全矩阵 3 模型 × 2 提示词 × 1 次 + Opus 手动 2 次 = 8 次 | 完成（2026-09-11） |
 | Phase 4 | `results/REPORT.md`（英文六段）+ `marketing/…v0.3.md`（数字定稿） | 完成（2026-09-11） |
-| Phase 6 | 每周一 `scripts/weekly.py --week N`：核对输入未变、抓方舟更新日志、只跑 evolving 详细版 3 次、画演化曲线 | 之后 |
+| Phase 6 | 每周一 `scripts/weekly.py --week N`：核对输入未变、抓 Ark 更新日志、只跑 evolving 详细版 3 次、画演化曲线 | 之后 |
 
 ## 4. 费用预估
 
-方舟按量计费；一次 60 轮的运行约 0.3–3M 输入 tokens（大部分是缓存命中）、1–10 万输出 tokens，每次 ¥2–15。全矩阵 6 次合计约 ¥20–40。今天被中断的两次约 ¥2。
+Ark 按量计费；一次 60 轮的运行约 0.3–3M 输入 tokens（大部分是缓存命中）、1–10 万输出 tokens，每次 ¥2–15。全矩阵 6 次合计约 ¥20–40。今天被中断的两次约 ¥2。
 
 ## 5. 项目里现在有什么
 
@@ -172,7 +172,7 @@ open manual_runs/evolving/vague/1/work/out/investor_update.pptx manual_runs/evol
 | `scripts/run_all.py` / `watch.py` | 矩阵（并发 2、失败重试一次、可 `--tag`）/ 实时表格 |
 | `scripts/parse_runs.py` / `check.py` + `checklib/` / `cost.py` / `report.py` / `show_run.py` | 遥测、13 项验收、成本、汇总与图、单行速览 |
 | `scripts/weekly.py` | Phase 6 每周复跑（输入/版本断言 + 更新日志 + 矩阵 + 报告） |
-| `scripts/manual_run.py` / `use_model.sh` | 手动路径：当前终端指向某个方舟模型并记录一次运行 |
+| `scripts/manual_run.py` / `use_model.sh` | 手动路径：当前终端指向某个 Ark 模型并记录一次运行 |
 | `scripts/probe_endpoints.py` / `smoke_cc.py` | 端点协议探测 / 干净环境接入验证 |
 | `tests/` | `make_reference_out.py` 造一份满分产出（13/13 自测）；`fixtures/` 今天两次被中断运行的事件流，用来回放测试 |
 | `VERSIONS.md` / `VERIFY.md` / `ASSUMPTIONS.md` | 版本锁定 / 已验证事实 / 已做假设 |

@@ -2,7 +2,7 @@
 
 **作者**：Zhiyao Zhang · 邮箱：zhang_zhiyao@outlook.com · 代码与数据：<https://github.com/zzybluebell/LLM-testing-seed-evolving/>
 
-> **v0.3 · 2026-09-11 · 数字定稿（n=1）**
+> **v0.3 · 2026-09-11 · 数字定稿（n=1，即每个模型 × 每种提示词各运行一次）**
 >
 > **状态**：四个模型 × 两份提示词共 8 次运行全部结束并由脚本打分，所有【待填】已按第 9 节清单回填。"记录运行"是各单元格目录 `runs/<模型>/<提示词>/1/`；Evolving 两次和 DeepSeek / GLM 的详细版都存在更早的一次尝试（见 5.3），账本 `results/ledger.csv` 全部保留。
 >
@@ -27,34 +27,34 @@
 | D7 | 协议兼容与零迁移 | 思考链签名往返、三行接入、固定 ID |
 | — | 速度（短板） | 出字速度、单轮等待 |
 
-结论一句话：详细规格下四个模型都是 13/13；一句话需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving **原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
+**总结**：详细规格下四个模型都是 13/13；一句话需求下 Evolving 9/9、DeepSeek-V4-Pro 7/9、GLM-5.2 7/9、Claude Opus 5 8/9。三家国产模型里只有 Evolving **原生读图**、**思考块带签名往返**；代价是它最慢，成本与 GLM 同档、高于 DeepSeek。
 
 ---
 
-## 1. 一句话
+## 1. 核心结论
 
 给 Doubao-Seed-Evolving 一张 36 个月的财务表和一句话，它独立完成"算指标、建带公式的 Excel 模型、画图、写投资人 PPT、自检、指出旧截图里的错误"整条办公工作流：模糊提示词下通过 **9/9** 项适用验收（`evolving/vague/1`，2026-09-11），七步详细规格下通过 **13/13** 项（`evolving/detailed/1`，2026-09-11）。同一任务、同一 Agent 工具、同一晚：DeepSeek-V4-Pro 7/9 与 13/13，GLM-5.2 7/9 与 13/13，Claude Opus 5 8/9 与 13/13（n=1，2026-09-10 / 11）。四个模型都指出了截图里 CAC $1,583 有误，但只有 Evolving 和 Opus 是看图看出来的，DeepSeek 与 GLM 的 Ark（Volcengine Ark，火山引擎的大模型服务平台）端点不接受图片，靠 tesseract OCR 补救。
 
 ---
 
-## 2. 调研：Doubao-Seed-Evolving 是什么，我们为什么这样测
+## 2. 背景调研与评测动机
 
-### 2.1 官方定位与公开说法
+### 2.1 产品定位（公开资料）
 
-| 特点 | 说法 | 来源 |
+| 特点 | 主张 | 来源 |
 |---|---|---|
-| **固定 ID，原地进化** | 不用版本号，一张模型卡、一个统一 Model ID `doubao-seed-evolving`，周级迭代；接一次，新版本自动生效，不改 ID、不迁端点、不改调用方式。"把模型当 SaaS 而不是软件" | 火山引擎开发者社区文章；腾讯新闻 / AITNT 2026-07-17 |
-| **定位 Coding 与 Agent** | 不追求泛化，专注代码生成与长程任务执行；指令理解、任务拆解、输出稳定性针对 Agent 场景强化 | 同上 |
-| **三大升级** | ① 1M 超长上下文（整仓代码、长文档、跨文件资料）；② 长程任务能力增强：步骤更多、耗时更长、依赖更复杂的任务更稳定；③ token 效率优于 Doubao-Seed-2.1-pro：消耗 token 更少、工具调用轮次更精简 | 火山引擎开发者社区《豆包 Seed-Evolving 强势上线…》；知乎《Doubao-Seed-Evolving 升级：1M 上下文来了！》；搜狐 / 知乎《实测豆包 Seed Evolving：1M 上下文 + 长程稳定》 |
+| **固定 ID，原地进化** | 不设版本号：统一模型 ID `doubao-seed-evolving`，周级迭代；接入一次即可自动获得新版本，无需更改 ID、端点或调用方式（官方表述："把模型当 SaaS 而不是软件"） | 火山引擎开发者社区文章；腾讯新闻 / AITNT 2026-07-17 |
+| **定位 Coding 与 Agent** | 定位于代码生成与长程任务执行，不以泛化能力为目标；指令理解、任务拆解与输出稳定性针对 Agent 场景强化 | 同上 |
+| **三大升级** | ① 1M 超长上下文：可在单次任务中处理整仓代码、长文档与跨文件资料；② 长程任务能力增强：步骤更多、耗时更长、依赖更复杂的任务更稳定；③ token 效率优于 Doubao-Seed-2.1-pro：token 消耗更少、工具调用轮次更精简 | 火山引擎开发者社区《豆包 Seed-Evolving 强势上线…》；知乎《Doubao-Seed-Evolving 升级：1M 上下文来了！》；搜狐 / 知乎《实测豆包 Seed Evolving：1M 上下文 + 长程稳定》 |
 | **深度思考默认开启** | 由 `thinking` 参数控制；Ark 建议 Agent 场景 effort=high、max_tokens ≥ 128K | Ark 文档 |
 | **价格** | 输入 6 元 / 缓存命中 1.2 元 / 输出 30 元（每百万 tokens），按量付费；另有 Coding Plan / Agent Plan 订阅 | Ark "模型价格"页，2026-09-10 读取 |
 | **Anthropic 协议兼容** | `/api/compatible` 路由；接入只需 `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_MODEL` 三个变量；1M 上下文需要 `[1m]` 后缀 | Ark 文档"接入 AI 工具 › Claude Code"，更新于 2026-08-26 |
 
-Ark "模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）内容由 JavaScript 渲染，脚本抓取不到 Evolving 的更新条目（`ASSUMPTIONS.md` 第 30 条），因此本稿**不引用**该页的更新日志内容；Phase 6 每周复跑时由人工在浏览器里读取后粘贴进 `results/changelog.md`。
+Ark 的"模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）由前端脚本渲染，自动抓取无法获得 Evolving 的更新条目（`ASSUMPTIONS.md` 第 30 条）。本报告因此不引用该页内容；后续按周复测（Phase 6）时由人工读取并记入 `results/changelog.md`。
 
-### 2.2 我们自己做的协议探测（2026-09-10）
+### 2.2 协议层验证（2026-09-10）
 
-本次所有模型都由同一个 Agent 工具驱动（Claude Code，一个命令行 Agent：把提示词交给模型，替模型执行读文件、跑脚本、写文件等工具调用，并管理多轮对话；下文统称 harness）。这类按 Anthropic 协议工作的工具每一轮都会把上一轮的思考块原样送回模型，所以“接进去就能像原生模型一样工作”有一个硬性技术前提：模型必须按 Anthropic 规范返回带 `signature` 的思考块。我们用 `scripts/probe_endpoints.py` 按 harness 的调用方式做了 5 项协议探测；表中“图片输入”一行来自正式运行的观察（`VERIFY.md` 第 47 条）：
+本次评测的全部模型均由同一个 Agent 工具驱动（Claude Code，一个命令行 Agent：负责将提示词提交给模型，代模型执行读文件、运行脚本、写文件等工具调用，并维护多轮对话状态；下文统称 harness）。此类基于 Anthropic 协议的工具在每一轮都会将上一轮的思考块原样回传给模型，因此模型能否在其中稳定工作，取决于一个硬性前提：按 Anthropic 规范返回带 `signature` 的思考块。我们使用 `scripts/probe_endpoints.py` 按 harness 的实际调用方式完成 5 项协议探测；表中"图片输入"一行来自正式运行中的观察（`VERIFY.md` 第 47 条）：
 
 | 探测项 | Evolving | DeepSeek-V4-Pro | GLM-5.2 |
 |---|---|---|---|
@@ -65,22 +65,22 @@ Ark "模型发布公告"页面（docs.volcengine.com/docs/82379/1159178）内容
 | 用量字段（input / output / cache_read / cache_creation） | 全有 | 全有 | 全有 |
 | 图片输入（Agent 用 `Read` 工具读一张 PNG） | ✅ | ❌ 400 "Model do not support image input" | ❌ 同左 |
 
-其它已确认：harness（2.1.231 版）在完全干净的环境（`env -i` + 白名单 + 独立 `CLAUDE_CONFIG_DIR`）下用 `--effort high` 驱动三个模型端到端成功；Ark 第二次请求即命中 13K tokens 缓存；Ark 不单独计费缓存写入（`cache_creation_input_tokens` 恒为 0）。来源：`VERIFY.md` 第 1–13、45 条。
+此外已验证：harness（2.1.231 版）在完全隔离的环境（`env -i` + 变量白名单 + 独立 `CLAUDE_CONFIG_DIR`）下以 `--effort high` 驱动三个模型均可端到端完成任务；Ark 在第二次请求即命中 13K tokens 缓存；Ark 不对缓存写入单独计费（`cache_creation_input_tokens` 恒为 0）。详见 `VERIFY.md` 第 1–13、45 条。
 
-### 2.3 从公开说法到可测维度
+### 2.3 从产品主张到评测维度
 
-调研的目的不是复述宣传，而是把每条说法变成一个能测、能复现、能回溯的指标：
+本节将官方的每一项能力主张映射为可测量、可复现、可回溯的指标，作为第 4 节各维度的依据：
 
-| 官方说法 | 我们怎么测 | 维度 |
+| 产品主张 | 评测方法 | 维度 |
 |---|---|---|
-| 长程任务更稳 | 七步规格一次跑完；`babysit`（回头问用户的次数）= 0；不撞 60 轮上限；无上下文压缩；Step 5 / Step 7 的自检真的执行了（`visual_qa_performed`） | D5 |
+| 长程任务更稳定 | 七步规格一次性完成；`babysit`（中途向用户提问的次数）= 0；未触及 60 轮上限；无上下文压缩；Step 5 / Step 7 的自检确实执行（`visual_qa_performed`） | D5 |
 | token 消耗更少、工具调用更精简 | `output_tokens`、`tool_calls`、缓存命中率、每通过一项验收的成本 | D6 |
-| 专注 Coding 与 Agent | 整个任务没有现成模板，全靠模型写 Python 生成 xlsx / pptx / 图，代码质量直接决定 13 项验收 | D1–D3 |
-| 1M 上下文 | 本 case 峰值单请求 < 130K tokens，**未触及**，留给可选的 Phase 5 压力版（`detailed_heavy` + 10 年历史 CSV） | 不测 |
-| 固定 ID、周级迭代 | 同一 case、同一冻结输入、同一 harness 版本，Phase 6 每周复跑画曲线 | D7 |
-| 深度思考默认开启 | 代价是单轮延迟与出字速度，如实记录 | 速度 |
+| 专注 Coding 与 Agent | 任务无现成模板，Excel、PPT 与图表均由模型编写 Python 生成，代码质量直接决定 13 项验收结果 | D1–D3 |
+| 1M 上下文 | 本案例峰值单次请求 < 190K tokens，未触及该能力；留待可选的 Phase 5 压力版（`detailed_heavy` + 10 年历史 CSV） | 本轮不测 |
+| 固定 ID、周级迭代 | 同一案例、同一冻结输入、同一 harness 版本，Phase 6 按周复测绘制能力曲线 | D7 |
+| 深度思考默认开启 | 记录单轮首字等待与出字速度，如实呈现 | 速度 |
 
-为什么四个模型用同一个 harness：Ark 官方文档把它列为推荐接入工具，且四个模型都能通过 Anthropic 协议路由跑在**同一个** harness 上，比较的才是模型本身而不是各家 Agent 框架的差异。
+**统一 harness 的理由**：Ark 官方文档将其列为推荐接入工具，且四个模型均可通过 Anthropic 协议路由接入同一 harness。在同一执行环境下比较，差异才可归因于模型本身，而非各家 Agent 框架。
 
 ---
 
